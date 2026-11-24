@@ -422,7 +422,7 @@
           <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
           <p class="text-xs sm:text-sm text-slate-600">
             <strong class="text-slate-800">Upload Langsung ke Drive:</strong> PDF A4 dikirim ke subfolder
-            <strong id="banner-subfolder-name" class="text-blue-800">PT SPT</strong> via Apps Script (tanpa simpan PDF lokal saat kirim).
+            <strong id="banner-subfolder-name" class="text-blue-800">PT SPT</strong> via Apps Script • Format otomatis: <code id="banner-pdf-pattern" class="text-xs bg-slate-100 px-1.5 py-0.5 rounded">SPT-YYYYMMDD-XXXX</code>.
           </p>
         </div>
         <div class="flex items-center gap-2 self-end sm:self-auto">
@@ -447,7 +447,7 @@
               <span class="w-7 h-7 rounded-lg bg-slate-900 text-white text-xs font-bold flex items-center justify-center">0</span>
               <div>
                 <h2 class="text-sm sm:text-base font-bold text-slate-900">Identitas Perusahaan, Dokumen &amp; Status Laporan</h2>
-                <p class="text-xs text-slate-500">Pilih perusahaan tujuan subfolder PDF, nomor registrasi &amp; status</p>
+                <p class="text-xs text-slate-500">Penomoran &amp; nama PDF otomatis berbasis inisial perusahaan + tanggal</p>
               </div>
             </div>
             <div class="flex items-center gap-2">
@@ -468,15 +468,15 @@
                 </select>
               </div>
               <div>
-                <label for="doc-ref" class="block text-xs font-bold uppercase tracking-wide text-slate-600 mb-1">Nomor Referensi Laporan</label>
+                <label for="doc-ref" class="block text-xs font-bold uppercase tracking-wide text-slate-600 mb-1">Nomor Referensi (Auto)</label>
                 <div class="flex gap-1.5">
                   <input type="text" id="doc-ref" class="font-mono font-bold text-blue-900 bg-slate-50" readonly />
-                  <button type="button" onclick="regenerateRefNumber()" class="px-3 rounded-xl border border-slate-300 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold shrink-0" title="Buat nomor baru">🔄</button>
+                  <button type="button" onclick="regenerateRefNumber()" class="px-3 rounded-xl border border-slate-300 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold shrink-0" title="Buat nomor urut baru">🔄</button>
                 </div>
               </div>
               <div>
-                <label for="doc-date" class="block text-xs font-bold uppercase tracking-wide text-slate-600 mb-1">Tanggal Pembuatan Laporan</label>
-                <input type="date" id="doc-date" required />
+                <label for="doc-date" class="block text-xs font-bold uppercase tracking-wide text-slate-600 mb-1">Tanggal Laporan</label>
+                <input type="date" id="doc-date" onchange="handleReportDateChange()" required />
               </div>
               <div>
                 <label for="doc-status" class="block text-xs font-bold uppercase tracking-wide text-slate-600 mb-1">Status Dokumen</label>
@@ -996,28 +996,29 @@
 
       const COMPANY_FOLDER_LINKS = {
         'PT SPT': {
-          prefix: 'SPT-INV',
+          initial: 'SPT',
           folderUrl: 'https://drive.google.com/drive/folders/1i9gfrfCl3bqg6OHcB4I-RiEVnHYg48Xu'
         },
         'PT SKU': {
-          prefix: 'SKU-INV',
+          initial: 'SKU',
           folderUrl: 'https://drive.google.com/drive/folders/1DSDrXdsZPEyQHZZFzzU_xiRxg-uDInmK'
         },
         'PT LPT': {
-          prefix: 'LPT-INV',
+          initial: 'LPT',
           folderUrl: 'https://drive.google.com/drive/folders/1fkGgm8tyR3gEfLSIRr_Zt9zhtoJEQaH9'
         },
         'PT BMI': {
-          prefix: 'BMI-INV',
+          initial: 'BMI',
           folderUrl: 'https://drive.google.com/drive/folders/1yTKHaEJHk_-ha6FDszoSwLIzcvxe2FUS'
         },
         'PT UMUB': {
-          prefix: 'UMUB-INV',
+          initial: 'UMUB',
           folderUrl: 'https://drive.google.com/drive/folders/1gutcd3jJpXup7EAo4VLWz_I9WtFwf7zY'
         }
       };
 
-      const STORAGE_KEY_DRAFT = 'spt_incident_5w1h_draft_v9';
+      const STORAGE_KEY_DRAFT = 'spt_incident_5w1h_draft_v10';
+      const STORAGE_KEY_SEQ = 'spt_incident_5w1h_seq_v10';
       const LOGO_PRIMARY_URL = 'https://lh3.googleusercontent.com/d/1_LHocTQd2GAnvY-gdH0pdiDKh7iDjzQT';
       const LOGO_FALLBACK_URL = 'https://drive.google.com/uc?export=view&id=1_LHocTQd2GAnvY-gdH0pdiDKh7iDjzQT';
       const LOGO_THUMBNAIL_URL = 'https://drive.google.com/thumbnail?id=1_LHocTQd2GAnvY-gdH0pdiDKh7iDjzQT&sz=w400';
@@ -1027,6 +1028,65 @@
 
       function getCompanyMeta(companyName) {
         return COMPANY_FOLDER_LINKS[companyName] || COMPANY_FOLDER_LINKS['PT SPT'];
+      }
+
+      function formatCompactDate(isoDateStr) {
+        const clean = String(isoDateStr || getTodayIso()).replace(/[^0-9]/g, '');
+        if (clean.length === 8) return clean;
+        return getTodayIso().replace(/-/g, '');
+      }
+
+      function getNextSequenceFor(initial, compactDate) {
+        const key = `${initial}_${compactDate}`;
+        try {
+          const map = JSON.parse(localStorage.getItem(STORAGE_KEY_SEQ) || '{}');
+          const nextNum = (parseInt(map[key] || '0', 10) || 0) + 1;
+          map[key] = nextNum;
+          localStorage.setItem(STORAGE_KEY_SEQ, JSON.stringify(map));
+          return String(nextNum).padStart(4, '0');
+        } catch (_) {
+          return String(Math.floor(1 + Math.random() * 9999)).padStart(4, '0');
+        }
+      }
+
+      // Menghasilkan nomor otomatis: <INISIAL>-<YYYYMMDD>-<XXXX> (mis. SPT-20261124-0001)
+      function generateAutoNumber(companyName = null, dateIso = null, forceIncrement = true) {
+        const company = companyName || getSelectedCompany();
+        const meta = getCompanyMeta(company);
+        const compactDate = formatCompactDate(dateIso || document.getElementById('doc-date')?.value || getTodayIso());
+        const key = `${meta.initial}_${compactDate}`;
+
+        let seqStr = '0001';
+        if (forceIncrement) {
+          seqStr = getNextSequenceFor(meta.initial, compactDate);
+        } else {
+          try {
+            const map = JSON.parse(localStorage.getItem(STORAGE_KEY_SEQ) || '{}');
+            const currentVal = parseInt(map[key] || '0', 10) || 0;
+            seqStr = String(Math.max(1, currentVal)).padStart(4, '0');
+            if (currentVal === 0) {
+              seqStr = getNextSequenceFor(meta.initial, compactDate);
+            }
+          } catch (_) {
+            seqStr = '0001';
+          }
+        }
+        return `${meta.initial}-${compactDate}-${seqStr}`;
+      }
+
+      // Menghasilkan nama file PDF otomatis: <INISIAL>-<YYYYMMDD>-<XXXX>_Laporan_Insiden_<YYYY-MM-DD>.pdf
+      function buildAutoPdfFilename(companyName, refNumber, dateIso) {
+        const meta = getCompanyMeta(companyName);
+        const safeDateIso = (dateIso || getTodayIso()).replace(/[^0-9-]/g, '');
+        const compactDate = formatCompactDate(safeDateIso);
+        const cleanRef = String(refNumber || '').trim().replace(/[^a-zA-Z0-9_-]/g, '_');
+
+        const expectedPrefix = `${meta.initial}-${compactDate}-`;
+        const finalDocCode = cleanRef.startsWith(expectedPrefix)
+          ? cleanRef
+          : `${meta.initial}-${compactDate}-${(cleanRef.split('-').pop() || '0001')}`;
+
+        return `${finalDocCode}_Laporan_Insiden_${safeDateIso}.pdf`;
       }
 
       window.handleLogoFallback = function(imgEl) {
@@ -1105,11 +1165,17 @@
 
       function updateCompanyUIElements(companyName) {
         const meta = getCompanyMeta(companyName);
+        const dateVal = document.getElementById('doc-date')?.value || getTodayIso();
+        const compactDate = formatCompactDate(dateVal);
+
         const sub = document.getElementById('header-company-subtitle');
         if (sub) sub.textContent = `${companyName} • Sistem Pelaporan Tanggap Darurat & Investigasi Awal`;
 
         const bannerSub = document.getElementById('banner-subfolder-name');
         if (bannerSub) bannerSub.textContent = companyName;
+
+        const patternEl = document.getElementById('banner-pdf-pattern');
+        if (patternEl) patternEl.textContent = `${meta.initial}-${compactDate}-XXXX`;
 
         const bannerLink = document.getElementById('banner-open-company-folder');
         if (bannerLink) {
@@ -1135,34 +1201,40 @@
         window.open(meta.folderUrl, '_blank', 'noopener,noreferrer');
       };
 
-      function generateRefCode(companyName = null, keepSequence = null) {
-        const company = companyName || getSelectedCompany();
-        const meta = getCompanyMeta(company);
-        const year = new Date().getFullYear();
-        const seq = keepSequence || String(Math.floor(1000 + Math.random() * 9000));
-        return `${meta.prefix}-${year}-${seq}`;
-      }
-
       window.handleCompanyChange = function() {
         const company = getSelectedCompany();
+        const dateVal = document.getElementById('doc-date')?.value || getTodayIso();
         const refInput = document.getElementById('doc-ref');
-        updateCompanyUIElements(company);
 
         if (refInput) {
-          const currentRef = refInput.value.trim();
-          const match = currentRef.match(/^[A-Z]+-INV-\d{4}-(\d{4})$/);
-          refInput.value = generateRefCode(company, match ? match[1] : null);
+          refInput.value = generateAutoNumber(company, dateVal, true);
         }
+        updateCompanyUIElements(company);
         saveFormToLocalStorage();
-        showToast('Perusahaan Dipilih', `Target subfolder laporan: ${company}.`, 'info', 2200);
+        showToast('Nomor & Inisial Diperbarui', `Nomor otomatis: ${refInput?.value || ''}`, 'info', 2500);
+      };
+
+      window.handleReportDateChange = function() {
+        const company = getSelectedCompany();
+        const dateVal = document.getElementById('doc-date')?.value || getTodayIso();
+        const refInput = document.getElementById('doc-ref');
+
+        if (refInput) {
+          refInput.value = generateAutoNumber(company, dateVal, false);
+        }
+        updateCompanyUIElements(company);
+        saveFormToLocalStorage();
       };
 
       window.regenerateRefNumber = function() {
+        const company = getSelectedCompany();
+        const dateVal = document.getElementById('doc-date')?.value || getTodayIso();
         const refInput = document.getElementById('doc-ref');
         if (refInput) {
-          refInput.value = generateRefCode(getSelectedCompany());
+          refInput.value = generateAutoNumber(company, dateVal, true);
+          updateCompanyUIElements(company);
           saveFormToLocalStorage();
-          showToast('Nomor Referensi Diperbarui', `Nomor baru: ${refInput.value}`, 'info', 2200);
+          showToast('Nomor Urut Baru Dibuat', `Nomor: ${refInput.value}`, 'info', 2200);
         }
       };
 
@@ -1306,6 +1378,8 @@
       function collectFormData() {
         const companyName = getSelectedCompany();
         const meta = getCompanyMeta(companyName);
+        const reportDate = document.getElementById('doc-date')?.value || getTodayIso();
+        const refNo = document.getElementById('doc-ref')?.value.trim() || generateAutoNumber(companyName, reportDate, false);
         const severityEl = document.querySelector('input[name="what-severity"]:checked');
         const whyFactors = Array.from(document.querySelectorAll('input[name="why-factor"]:checked')).map(cb => cb.value);
         const immediateActions = Array.from(document.querySelectorAll('input[name="immediate-action"]:checked')).map(cb => cb.value);
@@ -1319,9 +1393,11 @@
 
         return {
           perusahaan: companyName,
+          inisial_perusahaan: meta.initial,
           targetFolderUrl: meta.folderUrl,
-          nomor_referensi: document.getElementById('doc-ref')?.value.trim() || generateRefCode(companyName),
-          tanggal_laporan: document.getElementById('doc-date')?.value || getTodayIso(),
+          nomor_referensi: refNo,
+          nama_file_pdf: buildAutoPdfFilename(companyName, refNo, reportDate),
+          tanggal_laporan: reportDate,
           status: document.getElementById('doc-status')?.value || 'Terkirim',
           what: {
             kategori: document.getElementById('what-category')?.value || '',
@@ -1407,45 +1483,48 @@
         } catch (_) {}
       }
 
+      function initDefaults(companyName = 'PT SPT', dateIso = null) {
+        const safeDate = dateIso || getTodayIso();
+        document.getElementById('doc-company').value = companyName;
+        document.getElementById('doc-date').value = safeDate;
+        document.getElementById('doc-ref').value = generateAutoNumber(companyName, safeDate, true);
+        updateCompanyUIElements(companyName);
+        document.getElementById('when-date').value = safeDate;
+        document.getElementById('when-time').value = getCurrentTimeHm();
+        addPersonnelRow();
+        updateCompletionBadges();
+      }
+
       function loadFormFromLocalStorage() {
         try {
           const raw = localStorage.getItem(STORAGE_KEY_DRAFT);
           if (!raw) {
-            const defaultCompany = 'PT SPT';
-            document.getElementById('doc-company').value = defaultCompany;
-            updateCompanyUIElements(defaultCompany);
-            document.getElementById('doc-ref').value = generateRefCode(defaultCompany);
-            document.getElementById('doc-date').value = getTodayIso();
-            document.getElementById('when-date').value = getTodayIso();
-            document.getElementById('when-time').value = getCurrentTimeHm();
-            addPersonnelRow();
-            updateCompletionBadges();
+            initDefaults('PT SPT', getTodayIso());
             return;
           }
           populateFormWithData(JSON.parse(raw));
         } catch (_) {
-          const defaultCompany = 'PT SPT';
-          document.getElementById('doc-company').value = defaultCompany;
-          updateCompanyUIElements(defaultCompany);
-          document.getElementById('doc-ref').value = generateRefCode(defaultCompany);
-          document.getElementById('doc-date').value = getTodayIso();
-          addPersonnelRow();
+          initDefaults('PT SPT', getTodayIso());
         }
       }
 
       function populateFormWithData(d) {
         const companyVal = COMPANY_FOLDER_LINKS[d.perusahaan] ? d.perusahaan : 'PT SPT';
-        document.getElementById('doc-company').value = companyVal;
-        updateCompanyUIElements(companyVal);
+        const dateVal = d.tanggal_laporan || getTodayIso();
+        const meta = getCompanyMeta(companyVal);
+        const compactDate = formatCompactDate(dateVal);
 
-        let refVal = d.nomor_referensi || generateRefCode(companyVal);
-        const expectedPrefix = getCompanyMeta(companyVal).prefix;
-        if (!refVal.startsWith(expectedPrefix + '-')) {
-          refVal = generateRefCode(companyVal);
-        }
-        document.getElementById('doc-ref').value = refVal;
-        document.getElementById('doc-date').value = d.tanggal_laporan || getTodayIso();
+        document.getElementById('doc-company').value = companyVal;
+        document.getElementById('doc-date').value = dateVal;
         document.getElementById('doc-status').value = d.status || 'Terkirim';
+
+        const expectedPrefix = `${meta.initial}-${compactDate}-`;
+        const existingRef = String(d.nomor_referensi || '').trim();
+        document.getElementById('doc-ref').value = existingRef.startsWith(expectedPrefix)
+          ? existingRef
+          : generateAutoNumber(companyVal, dateVal, false);
+
+        updateCompanyUIElements(companyVal);
 
         document.getElementById('what-category').value = d.what?.kategori || '';
         document.getElementById('what-title').value = d.what?.judul || '';
@@ -1454,7 +1533,7 @@
         const sevRadio = document.querySelector(`input[name="what-severity"][value="${sevVal}"]`);
         if (sevRadio) sevRadio.checked = true;
 
-        document.getElementById('when-date').value = d.when?.tanggal || getTodayIso();
+        document.getElementById('when-date').value = d.when?.tanggal || dateVal;
         document.getElementById('when-time').value = d.when?.jam || '';
         document.getElementById('when-shift').value = d.when?.shift || 'Shift 1 (Siang / Day Shift)';
 
@@ -1510,10 +1589,13 @@
 
       window.fillSampleData = function() {
         const currentCompany = getSelectedCompany();
+        const dateVal = document.getElementById('doc-date')?.value || getTodayIso();
+        const autoRef = generateAutoNumber(currentCompany, dateVal, true);
+
         const sample = {
           perusahaan: currentCompany,
-          nomor_referensi: generateRefCode(currentCompany),
-          tanggal_laporan: getTodayIso(),
+          nomor_referensi: autoRef,
+          tanggal_laporan: dateVal,
           status: 'Terkirim',
           what: {
             kategori: 'Property Damage (Kerusakan Aset / Unit)',
@@ -1522,7 +1604,7 @@
             deskripsi_dampak: 'Bumper depan kiri dan step tangga unit DT-14 penyok ringan akibat menyentuh tanggul pengaman (safety berm). Tidak ada korban jiwa maupun cedera personel.'
           },
           when: {
-            tanggal: getTodayIso(),
+            tanggal: dateVal,
             jam: '14:15',
             shift: 'Shift 1 (Siang / Day Shift)'
           },
@@ -1569,7 +1651,7 @@
 
         populateFormWithData(sample);
         saveFormToLocalStorage();
-        showToast('Contoh Data Dimuat', `Formulir diisi dengan contoh insiden ${currentCompany}.`, 'success');
+        showToast('Contoh Data Dimuat', `Nomor ${autoRef} untuk ${currentCompany}.`, 'success');
       };
 
       window.copyWhatsAppSummary = function() {
@@ -1582,6 +1664,7 @@
           `*LAPORAN AWAL INSIDEN (5W+1H) — ${d.perusahaan.toUpperCase()}*`,
           `Perusahaan: *${d.perusahaan}*`,
           `No. Ref: *${d.nomor_referensi}*`,
+          `File PDF: *${d.nama_file_pdf}*`,
           `Status: ${d.status}`,
           ``,
           `*1. WHAT (Apa):* ${d.what.judul || '-'}`,
@@ -1623,18 +1706,11 @@
         localStorage.removeItem(STORAGE_KEY_DRAFT);
         uploadedPhotos = [];
         document.getElementById('incident-form').reset();
-        document.getElementById('doc-company').value = currentCompany;
-        updateCompanyUIElements(currentCompany);
-        document.getElementById('doc-ref').value = generateRefCode(currentCompany);
-        document.getElementById('doc-date').value = getTodayIso();
-        document.getElementById('when-date').value = getTodayIso();
-        document.getElementById('when-time').value = getCurrentTimeHm();
         const list = document.getElementById('personnel-list');
         if (list) list.innerHTML = '';
-        addPersonnelRow();
+        initDefaults(currentCompany, getTodayIso());
         renderPhotoPreviews();
-        updateCompletionBadges();
-        showToast('Formulir Dikosongkan', `Nomor referensi baru ${currentCompany} dibuat.`, 'info');
+        showToast('Formulir Dikosongkan', `Nomor baru ${document.getElementById('doc-ref').value} dibuat.`, 'info');
       };
 
       function copyTextWithFallback(text, successTitle, successMsg) {
@@ -1748,9 +1824,6 @@
         copyTextWithFallback(val, 'Resume AI Disalin', 'Ringkasan eksekutif disalin ke clipboard.');
       };
 
-      // ======================================================================
-      // MARKUP DOKUMEN A4 IDENTIK DENGAN HASIL CETAK
-      // ======================================================================
       function buildCleanA4Markup(d, resolvedLogoSrc = null) {
         const logoSrc = resolvedLogoSrc || document.getElementById('spt-logo-img')?.src || LOGO_PRIMARY_URL;
 
@@ -1921,7 +1994,7 @@
               </tr>
             </table>
             <div style="margin-top:5px; font-size:7.5pt; color:#64748B; display:flex; justify-content:space-between;">
-              <span>Dokumen Resmi HSE ${escapeHtml(d.perusahaan)} • Folder: ${escapeHtml(d.perusahaan)}</span>
+              <span>Dokumen Resmi HSE ${escapeHtml(d.perusahaan)} • File: ${escapeHtml(d.nama_file_pdf)}</span>
               <span>Dicetak / Diarsipkan: ${new Date().toLocaleString('id-ID')}</span>
             </div>
           </div>
@@ -2000,9 +2073,7 @@
 
         await new Promise((r) => setTimeout(r, 120));
 
-        const safeRef = (d.nomor_referensi || 'SPT-INV').replace(/[^a-zA-Z0-9_-]/g, '_');
-        const safeDate = (d.tanggal_laporan || getTodayIso()).replace(/[^0-9-]/g, '');
-        const pdfFilename = `${safeRef}_Laporan_Insiden_${safeDate}.pdf`;
+        const pdfFilename = d.nama_file_pdf || buildAutoPdfFilename(d.perusahaan, d.nomor_referensi, d.tanggal_laporan);
 
         function isBlankHorizontalRow(ctx, width, y, sampleStep = 4) {
           if (y < 0 || y >= ctx.canvas.height) return false;
@@ -2146,7 +2217,7 @@
         const endpointUrl = (APPS_SCRIPT_UPLOAD_URL || '').trim();
 
         setButtonsLoading(true, d.perusahaan);
-        showToast('Menyusun PDF A4...', `Menyiapkan PDF untuk ${d.perusahaan}...`, 'info', 3000);
+        showToast('Menyusun PDF A4...', `Menyiapkan ${d.nama_file_pdf} untuk ${d.perusahaan}...`, 'info', 3000);
 
         try {
           const { base64Pdf, pdfFilename } = await generateA4PdfBase64IdenticalToPrint(d);
@@ -2175,6 +2246,7 @@
           input.name = 'payload';
           input.value = JSON.stringify({
             perusahaan: d.perusahaan,
+            inisial_perusahaan: d.inisial_perusahaan,
             nomor_referensi: d.nomor_referensi,
             filename: pdfFilename,
             pdfBase64: base64Pdf
@@ -2189,7 +2261,7 @@
             setButtonsLoading(false, d.perusahaan);
             showToast(
               `PDF Dikirim ke ${d.perusahaan}`,
-              `${pdfFilename} dikirim ke folder ${d.perusahaan}. Cek Google Drive / Executions Apps Script.`,
+              `${pdfFilename} dikirim ke folder ${d.perusahaan}.`,
               'success',
               6000
             );
