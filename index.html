@@ -448,18 +448,7 @@
             <strong id="banner-subfolder-name" class="text-blue-800">PT SPT</strong>.
           </p>
         </div>
-        <div class="flex items-center gap-2 self-end sm:self-auto">
-          <span id="autosave-time" class="text-[11px] text-slate-400 font-medium">Baru saja</span>
-          <a
-            id="banner-open-company-folder"
-            href="https://drive.google.com/drive/folders/1i9gfrfCl3bqg6OHcB4I-RiEVnHYg48Xu"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 transition"
-          >
-            📂 Buka Folder PT SPT ↗
-          </a>
-        </div>
+        <span id="autosave-time" class="text-[11px] text-slate-400 font-medium self-end sm:self-auto">Baru saja</span>
       </div>
 
       <form id="incident-form" onsubmit="event.preventDefault();">
@@ -981,10 +970,6 @@
       <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl p-5 shadow-2xl border-t border-slate-200 space-y-2.5">
         <div class="w-10 h-1 bg-slate-300 rounded-full mx-auto mb-3"></div>
         <h3 class="text-sm font-bold text-slate-900 mb-2">Utilitas Laporan SPT Group</h3>
-        <button type="button" onclick="toggleMobileMoreSheet(false); openCurrentCompanyFolder();" class="w-full py-3 px-4 rounded-xl text-left text-sm font-semibold bg-blue-50 text-blue-900 border border-blue-200 flex items-center justify-between">
-          <span>📂 Buka Subfolder Perusahaan di Drive</span>
-          <span>↗</span>
-        </button>
         <button type="button" onclick="toggleMobileMoreSheet(false); copyWhatsAppSummary();" class="w-full py-3 px-4 rounded-xl text-left text-sm font-semibold bg-emerald-50 text-emerald-900 border border-emerald-200 flex items-center justify-between">
           <span>📲 Salin Ringkasan WhatsApp</span>
           <span>→</span>
@@ -1040,8 +1025,8 @@
         }
       };
 
-      const STORAGE_KEY_DRAFT = 'spt_incident_5w1h_draft_v11';
-      const STORAGE_KEY_SEQ = 'spt_incident_5w1h_seq_v11';
+      const STORAGE_KEY_DRAFT = 'spt_incident_5w1h_draft_v12';
+      const STORAGE_KEY_SEQ = 'spt_incident_5w1h_seq_v12';
       const LOGO_PRIMARY_URL = 'https://lh3.googleusercontent.com/d/1_LHocTQd2GAnvY-gdH0pdiDKh7iDjzQT';
       const LOGO_FALLBACK_URL = 'https://drive.google.com/uc?export=view&id=1_LHocTQd2GAnvY-gdH0pdiDKh7iDjzQT';
       const LOGO_THUMBNAIL_URL = 'https://drive.google.com/thumbnail?id=1_LHocTQd2GAnvY-gdH0pdiDKh7iDjzQT&sz=w400';
@@ -1072,7 +1057,6 @@
         }
       }
 
-      // Menghasilkan nomor otomatis: <INISIAL>-<YYYYMMDD>-<XXXX> (mis. SPT-20261124-0001)
       function generateAutoNumber(companyName = null, dateIso = null, forceIncrement = true) {
         const company = companyName || getSelectedCompany();
         const meta = getCompanyMeta(company);
@@ -1097,7 +1081,6 @@
         return `${meta.initial}-${compactDate}-${seqStr}`;
       }
 
-      // Menghasilkan nama file dokumen/PDF otomatis: <INISIAL>-<YYYYMMDD>-<XXXX>_Laporan_Insiden_<YYYY-MM-DD>.pdf
       function buildAutoPdfFilename(companyName, refNumber, dateIso) {
         const meta = getCompanyMeta(companyName);
         const safeDateIso = (dateIso || getTodayIso()).replace(/[^0-9-]/g, '');
@@ -1200,12 +1183,6 @@
         const patternEl = document.getElementById('banner-pdf-pattern');
         if (patternEl) patternEl.textContent = `${meta.initial}-${compactDate}-XXXX`;
 
-        const bannerLink = document.getElementById('banner-open-company-folder');
-        if (bannerLink) {
-          bannerLink.href = meta.folderUrl;
-          bannerLink.textContent = `📂 Buka Folder ${companyName} ↗`;
-        }
-
         const dotLbl = document.getElementById('drive-dot-label');
         if (dotLbl) dotLbl.textContent = `Direct Drive • ${companyName}`;
 
@@ -1218,11 +1195,6 @@
         const mobLbl = document.getElementById('lbl-mobile-send-pdf');
         if (mobLbl) mobLbl.textContent = `Kirim PDF (${companyName})`;
       }
-
-      window.openCurrentCompanyFolder = function() {
-        const meta = getCompanyMeta(getSelectedCompany());
-        window.open(meta.folderUrl, '_blank', 'noopener,noreferrer');
-      };
 
       window.handleCompanyChange = function() {
         const company = getSelectedCompany();
