@@ -167,7 +167,7 @@
       justify-content: space-between;
       border-bottom: 2px solid #0F294A;
       padding-bottom: 6px;
-      margin-bottom: 7px;
+      margin-bottom: 8px;
       page-break-inside: avoid;
       break-inside: avoid;
     }
@@ -181,14 +181,15 @@
       font-size: 8.5pt;
       letter-spacing: 0.03em;
       padding: 3.5px 8px;
-      margin-top: 6px;
-      margin-bottom: 3px;
+      margin-top: 8px;
+      margin-bottom: 4px;
       text-transform: uppercase;
       page-break-after: avoid;
       break-after: avoid;
     }
 
     .print-block {
+      margin-bottom: 6px;
       page-break-inside: avoid;
       break-inside: avoid;
     }
@@ -281,6 +282,8 @@
       padding: 5px 8px;
       text-align: center;
       vertical-align: top;
+      page-break-inside: avoid;
+      break-inside: avoid;
     }
 
     .sig-space { height: 42px; }
@@ -299,6 +302,8 @@
         font-family: 'Inter', Arial, sans-serif !important;
         font-size: 9pt !important;
         line-height: 1.35 !important;
+        height: auto !important;
+        overflow: visible !important;
       }
       #app-ui, #toast-box, #mobile-more-sheet, #pdf-render-sandbox {
         display: none !important;
@@ -309,6 +314,23 @@
         max-width: 100% !important;
         margin: 0 !important;
         padding: 0 !important;
+        overflow: visible !important;
+      }
+      .print-block,
+      .print-header,
+      .print-table tr,
+      .print-narrative,
+      .print-photo-grid,
+      .print-photo-item,
+      .print-signatures,
+      .print-signatures tr,
+      .print-signatures td {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+      }
+      .print-section-title {
+        break-after: avoid !important;
+        page-break-after: avoid !important;
       }
     }
   </style>
@@ -421,8 +443,9 @@
         <div class="flex items-center gap-2.5">
           <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
           <p class="text-xs sm:text-sm text-slate-600">
-            <strong class="text-slate-800">Upload Langsung ke Drive:</strong> PDF A4 dikirim ke subfolder
-            <strong id="banner-subfolder-name" class="text-blue-800">PT SPT</strong> via Apps Script • Format otomatis: <code id="banner-pdf-pattern" class="text-xs bg-slate-100 px-1.5 py-0.5 rounded">SPT-YYYYMMDD-XXXX</code>.
+            <strong class="text-slate-800">Upload Langsung ke Drive:</strong> PDF &amp; Cetak A4 menggunakan format otomatis
+            <code id="banner-pdf-pattern" class="text-xs bg-slate-100 px-1.5 py-0.5 rounded">SPT-YYYYMMDD-XXXX</code> • Subfolder:
+            <strong id="banner-subfolder-name" class="text-blue-800">PT SPT</strong>.
           </p>
         </div>
         <div class="flex items-center gap-2 self-end sm:self-auto">
@@ -447,7 +470,7 @@
               <span class="w-7 h-7 rounded-lg bg-slate-900 text-white text-xs font-bold flex items-center justify-center">0</span>
               <div>
                 <h2 class="text-sm sm:text-base font-bold text-slate-900">Identitas Perusahaan, Dokumen &amp; Status Laporan</h2>
-                <p class="text-xs text-slate-500">Penomoran &amp; nama PDF otomatis berbasis inisial perusahaan + tanggal</p>
+                <p class="text-xs text-slate-500">Penomoran &amp; nama file PDF/Cetak otomatis berbasis inisial perusahaan + tanggal</p>
               </div>
             </div>
             <div class="flex items-center gap-2">
@@ -1017,8 +1040,8 @@
         }
       };
 
-      const STORAGE_KEY_DRAFT = 'spt_incident_5w1h_draft_v10';
-      const STORAGE_KEY_SEQ = 'spt_incident_5w1h_seq_v10';
+      const STORAGE_KEY_DRAFT = 'spt_incident_5w1h_draft_v11';
+      const STORAGE_KEY_SEQ = 'spt_incident_5w1h_seq_v11';
       const LOGO_PRIMARY_URL = 'https://lh3.googleusercontent.com/d/1_LHocTQd2GAnvY-gdH0pdiDKh7iDjzQT';
       const LOGO_FALLBACK_URL = 'https://drive.google.com/uc?export=view&id=1_LHocTQd2GAnvY-gdH0pdiDKh7iDjzQT';
       const LOGO_THUMBNAIL_URL = 'https://drive.google.com/thumbnail?id=1_LHocTQd2GAnvY-gdH0pdiDKh7iDjzQT&sz=w400';
@@ -1074,7 +1097,7 @@
         return `${meta.initial}-${compactDate}-${seqStr}`;
       }
 
-      // Menghasilkan nama file PDF otomatis: <INISIAL>-<YYYYMMDD>-<XXXX>_Laporan_Insiden_<YYYY-MM-DD>.pdf
+      // Menghasilkan nama file dokumen/PDF otomatis: <INISIAL>-<YYYYMMDD>-<XXXX>_Laporan_Insiden_<YYYY-MM-DD>.pdf
       function buildAutoPdfFilename(companyName, refNumber, dateIso) {
         const meta = getCompanyMeta(companyName);
         const safeDateIso = (dateIso || getTodayIso()).replace(/[^0-9-]/g, '');
@@ -1994,7 +2017,7 @@
               </tr>
             </table>
             <div style="margin-top:5px; font-size:7.5pt; color:#64748B; display:flex; justify-content:space-between;">
-              <span>Dokumen Resmi HSE ${escapeHtml(d.perusahaan)} • File: ${escapeHtml(d.nama_file_pdf)}</span>
+              <span>Dokumen Resmi HSE ${escapeHtml(d.perusahaan)} • No: ${escapeHtml(d.nomor_referensi)} • File: ${escapeHtml(d.nama_file_pdf)}</span>
               <span>Dicetak / Diarsipkan: ${new Date().toLocaleString('id-ID')}</span>
             </div>
           </div>
@@ -2004,8 +2027,25 @@
       window.prepareAndPrint = function() {
         const d = collectFormData();
         const printSheet = document.getElementById('print-sheet');
-        if (printSheet) printSheet.innerHTML = buildCleanA4Markup(d);
-        setTimeout(() => window.print(), 120);
+        const originalTitle = document.title;
+        const docBaseName = (d.nama_file_pdf || `${d.nomor_referensi}_Laporan_Insiden_${d.tanggal_laporan}`).replace(/\.pdf$/i, '');
+
+        if (printSheet) {
+          printSheet.innerHTML = buildCleanA4Markup(d);
+        }
+
+        document.title = docBaseName;
+
+        const restoreTitleOnce = () => {
+          document.title = originalTitle;
+          window.removeEventListener('afterprint', restoreTitleOnce);
+        };
+        window.addEventListener('afterprint', restoreTitleOnce);
+
+        setTimeout(() => {
+          window.print();
+          setTimeout(restoreTitleOnce, 1000);
+        }, 120);
       };
 
       function getLogoDataUrlForPdf() {
