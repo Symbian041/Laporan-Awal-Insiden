@@ -1,0 +1,2664 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>Formulir Laporan Awal Insiden 5W+1H - SPT Group</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    if (window.tailwind) {
+      window.tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: { sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'] },
+            colors: {
+              spt: {
+                navy: '#0F294A',
+                blue: '#1D4ED8',
+                amber: '#D97706',
+                red: '#DC2626',
+                slate: '#F1F5F9'
+              }
+            }
+          }
+        }
+      };
+    }
+  </script>
+  <style>
+    /* ==========================================================================
+       FALLBACK CSS MURNI & STYLING UTAMA (Anti-Blank meski Tailwind CDN offline)
+       ========================================================================== */
+    :root {
+      --spt-navy: #0F294A;
+      --spt-navy-light: #1E3A8A;
+      --spt-amber: #D97706;
+      --spt-red: #DC2626;
+      --spt-emerald: #059669;
+      --spt-drive: #1A73E8;
+      --spt-bg: #F1F5F9;
+      --spt-card: #FFFFFF;
+      --spt-border: #CBD5E1;
+      --spt-text: #0F172A;
+      --spt-muted: #475569;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+    body {
+      margin: 0;
+      background-color: var(--spt-bg);
+      color: var(--spt-text);
+      -webkit-font-smoothing: antialiased;
+      padding-bottom: calc(88px + env(safe-area-inset-bottom, 16px));
+    }
+
+    @media (min-width: 768px) {
+      body { padding-bottom: 40px; }
+    }
+
+    /* Input 16px untuk mencegah auto-zoom di iOS/Android */
+    input[type="text"],
+    input[type="date"],
+    input[type="time"],
+    input[type="url"],
+    select,
+    textarea {
+      width: 100%;
+      font-size: 16px !important;
+      line-height: 1.45;
+      color: #0F172A;
+      background-color: #FFFFFF;
+      border: 1px solid #CBD5E1;
+      border-radius: 0.75rem;
+      padding: 0.625rem 0.875rem;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #1D4ED8;
+      box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.15);
+    }
+
+    /* Fallback grid & flex utilitas jika CDN lambat */
+    .fallback-container { max-width: 1080px; margin: 0 auto; padding: 0 12px; }
+    @media (min-width: 640px) { .fallback-container { padding: 0 20px; } }
+
+    .section-card {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 1rem;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+      margin-bottom: 14px;
+      overflow: hidden;
+    }
+
+    .section-header-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 14px 16px;
+      background: #FFFFFF;
+      border: none;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .section-body {
+      padding: 0 16px 18px 16px;
+      border-top: 1px solid #F1F5F9;
+    }
+
+    .section-body.collapsed {
+      display: none;
+    }
+
+    @media (min-width: 768px) {
+      .section-body.collapsed {
+        display: block; /* Di desktop selalu terbuka rapi */
+      }
+      .chevron-mobile { display: none; }
+    }
+
+    /* Quick Jump Pills horizontal scroll mobile */
+    .pills-scroller {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 8px 12px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .pills-scroller::-webkit-scrollbar { display: none; }
+
+    /* Severity radio card */
+    .sev-option input:checked + .sev-box {
+      border-width: 2px;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.08);
+    }
+    .sev-ringan input:checked + .sev-box { background: #ECFDF5; border-color: #059669; color: #065F46; }
+    .sev-sedang input:checked + .sev-box { background: #FFFBEB; border-color: #D97706; color: #92400E; }
+    .sev-berat input:checked + .sev-box { background: #FFF7ED; border-color: #EA580C; color: #9A3412; }
+    .sev-kritis input:checked + .sev-box { background: #FEF2F2; border-color: #DC2626; color: #991B1B; }
+
+    /* Floating Bottom Bar Mobile */
+    .mobile-bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 40;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid #CBD5E1;
+      padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+      box-shadow: 0 -4px 16px rgba(15, 23, 42, 0.08);
+    }
+
+    /* Toast Notification */
+    #toast-box {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 90;
+      max-width: calc(100vw - 32px);
+      transition: all 0.25s ease;
+    }
+
+    /* ==========================================================================
+       ATURAN CETAK A4 KOMPAK 1 KOLOM MURNI (#print-sheet)
+       ========================================================================== */
+    #print-sheet {
+      display: none;
+    }
+
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 11mm 12mm 11mm 12mm;
+      }
+
+      html, body {
+        background: #FFFFFF !important;
+        color: #000000 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        font-family: 'Inter', Arial, sans-serif !important;
+        font-size: 9.5pt !important;
+        line-height: 1.35 !important;
+      }
+
+      /* Sembunyikan seluruh antarmuka layar */
+      #app-ui, #toast-box, #drive-modal, #mobile-more-sheet {
+        display: none !important;
+      }
+
+      /* Tampilkan dokumen A4 1 kolom murni */
+      #print-sheet {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      .print-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 2px solid #0F294A;
+        padding-bottom: 6px;
+        margin-bottom: 8px;
+      }
+
+      .print-section-title {
+        background-color: #0F294A !important;
+        color: #FFFFFF !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        font-weight: 700;
+        font-size: 8.8pt;
+        letter-spacing: 0.03em;
+        padding: 3px 8px;
+        margin-top: 7px;
+        margin-bottom: 4px;
+        text-transform: uppercase;
+      }
+
+      .print-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 4px;
+      }
+
+      .print-table td, .print-table th {
+        border: 1px solid #CBD5E1;
+        padding: 3.5px 6px;
+        vertical-align: top;
+        text-align: left;
+        font-size: 9pt;
+      }
+
+      .print-table th {
+        background-color: #F1F5F9 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        font-weight: 600;
+        color: #1E293B;
+      }
+
+      .print-label {
+        width: 24%;
+        font-weight: 600;
+        color: #334155;
+        background-color: #F8FAFC !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .print-narrative {
+        padding: 4px 2px;
+        white-space: pre-wrap;
+        font-size: 9pt;
+        color: #0F172A;
+      }
+
+      .print-photo-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 4px;
+      }
+
+      .print-photo-item {
+        width: 31.5%;
+        border: 1px solid #CBD5E1;
+        padding: 3px;
+        text-align: center;
+        page-break-inside: avoid;
+      }
+
+      .print-photo-item img {
+        width: 100%;
+        height: 115px;
+        object-fit: cover;
+        display: block;
+      }
+
+      .print-signatures {
+        margin-top: 12px;
+        width: 100%;
+        border-collapse: collapse;
+        page-break-inside: avoid;
+      }
+
+      .print-signatures td {
+        width: 33.33%;
+        border: 1px solid #CBD5E1;
+        padding: 6px 8px;
+        text-align: center;
+        vertical-align: top;
+      }
+
+      .sig-space {
+        height: 44px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================================================
+       NOTIFIKASI TOAST GLOBAL
+       ======================================================================== -->
+  <div id="toast-box" class="hidden" role="status" aria-live="polite">
+    <div id="toast-content" class="flex items-start gap-3 px-4 py-3 rounded-2xl shadow-xl border bg-slate-900 text-white border-slate-700 text-sm">
+      <span id="toast-icon" class="mt-0.5 shrink-0"></span>
+      <div class="flex-1 min-w-0">
+        <p id="toast-title" class="font-semibold text-white leading-tight"></p>
+        <p id="toast-msg" class="text-xs text-slate-300 mt-0.5 leading-snug"></p>
+      </div>
+      <button type="button" onclick="hideToast()" class="text-slate-400 hover:text-white p-1" aria-label="Tutup notifikasi">✕</button>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       ANTARMWUKA LAYAR UTAMA (#app-ui)
+       ======================================================================== -->
+  <div id="app-ui">
+    <!-- TOP CORPORATE HEADER -->
+    <header class="bg-[#0F294A] text-white shadow-md sticky top-0 z-30 border-b border-blue-900/60">
+      <div class="fallback-container py-3 flex items-center justify-between gap-3">
+        <!-- Brand & Logo -->
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-white p-1.5 flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
+            <img
+              id="spt-logo-img"
+              src="https://lh3.googleusercontent.com/d/1jyU7PnF4t0amHGLGMLnqSVBKH4RluMhM"
+              alt="Logo SPT Group"
+              class="w-full h-full object-contain"
+              onerror="handleLogoFallback(this)"
+            />
+            <!-- Fallback SVG Vektor SPT Group -->
+            <svg id="spt-logo-svg" class="hidden w-full h-full" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="SPT Group Logo">
+              <rect width="64" height="64" rx="12" fill="#0F294A"/>
+              <path d="M12 42L24 20L34 36L42 25L52 42H12Z" fill="#D97706"/>
+              <circle cx="44" cy="17" r="5" fill="#38BDF8"/>
+              <text x="32" y="55" text-anchor="middle" fill="#FFFFFF" font-family="Inter, sans-serif" font-weight="800" font-size="11">SPT GROUP</text>
+            </svg>
+          </div>
+          <div class="min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-400/30">
+                HSE Division • 5W+1H
+              </span>
+              <span id="header-drive-pill" class="hidden sm:inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-md bg-blue-500/20 text-blue-200 border border-blue-400/30">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                DB Drive Siap
+              </span>
+            </div>
+            <h1 class="text-sm sm:text-lg font-extrabold tracking-tight truncate mt-0.5">
+              Laporan Awal Insiden (Initial Incident Report)
+            </h1>
+            <p class="text-[11px] sm:text-xs text-slate-300 truncate">
+              PT SPT Group • Sistem Pelaporan Tanggap Darurat &amp; Investigasi Awal
+            </p>
+          </div>
+        </div>
+
+        <!-- Desktop Top Action Toolbar -->
+        <div class="hidden md:flex items-center gap-2 shrink-0">
+          <button
+            type="button"
+            onclick="fillSampleData()"
+            class="px-3 py-2 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/20 text-white border border-white/15 transition flex items-center gap-1.5"
+            title="Isi otomatis dengan contoh kasus lapangan"
+          >
+            <span>✨</span> Isi Contoh
+          </button>
+          <button
+            type="button"
+            onclick="copyWhatsAppSummary()"
+            class="px-3 py-2 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm transition flex items-center gap-1.5"
+            title="Salin format laporan singkat untuk grup WhatsApp HSE/KTT"
+          >
+            <span>📲</span> Salin WA
+          </button>
+          <button
+            type="button"
+            onclick="triggerDriveUploadAction()"
+            class="px-3.5 py-2 rounded-xl text-xs font-bold bg-[#1A73E8] hover:bg-blue-500 text-white shadow-md border border-blue-300/40 transition flex items-center gap-1.5 relative"
+            title="Upload langsung laporan ini ke folder Database Laporan Insiden SPT Group di Google Drive"
+          >
+            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M7.71 3.5L1.15 15l3.43 6 6.55-11.5L7.71 3.5zm1.73 0l6.55 11.5h6.86L16.29 3.5H9.44zm5.98 12.5H2.87l-1.72 3h13.7l3.43-6-2.86 3z"/>
+            </svg>
+            <span>Upload ke Drive</span>
+            <span id="desktop-queue-badge" class="hidden ml-1 px-1.5 py-0.2 text-[10px] font-extrabold rounded-full bg-amber-400 text-slate-950">0</span>
+          </button>
+          <button
+            type="button"
+            onclick="prepareAndPrint()"
+            class="px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-sm transition flex items-center gap-1.5"
+          >
+            <span>🖨️</span> Pratinjau Cetak A4
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Quick Jump Pills (<768px) -->
+      <nav class="md:hidden bg-[#0B1F3A] border-t border-white/10" aria-label="Navigasi cepat bagian formulir">
+        <div class="pills-scroller">
+          <button type="button" onclick="jumpToSection('sec-meta')" class="shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold bg-white/10 text-white hover:bg-blue-600 transition">📋 Info</button>
+          <button type="button" onclick="jumpToSection('sec-what')" class="shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold bg-white/10 text-white hover:bg-blue-600 transition">1. WHAT</button>
+          <button type="button" onclick="jumpToSection('sec-when')" class="shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold bg-white/10 text-white hover:bg-blue-600 transition">2. WHEN</button>
+          <button type="button" onclick="jumpToSection('sec-where')" class="shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold bg-white/10 text-white hover:bg-blue-600 transition">3. WHERE</button>
+          <button type="button" onclick="jumpToSection('sec-who')" class="shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold bg-white/10 text-white hover:bg-blue-600 transition">4. WHO</button>
+          <button type="button" onclick="jumpToSection('sec-why')" class="shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold bg-white/10 text-white hover:bg-blue-600 transition">5. WHY</button>
+          <button type="button" onclick="jumpToSection('sec-how')" class="shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold bg-white/10 text-white hover:bg-blue-600 transition">6. HOW</button>
+          <button type="button" onclick="jumpToSection('sec-action')" class="shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold bg-white/10 text-white hover:bg-blue-600 transition">🛡️ Tindakan</button>
+          <button type="button" onclick="jumpToSection('sec-ai')" class="shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold bg-indigo-500/30 text-indigo-200 border border-indigo-400/30 transition">🤖 Resume AI</button>
+        </div>
+      </nav>
+    </header>
+
+    <!-- MAIN FORM CONTAINER -->
+    <main class="fallback-container mt-4">
+      <!-- Status & Auto-Save Info Banner -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 mb-3.5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+          <p class="text-xs sm:text-sm text-slate-600">
+            <strong class="text-slate-800">Auto-Save Lokal Aktif:</strong> Data tersimpan otomatis di perangkat. Target Cloud:
+            <a href="https://drive.google.com/drive/folders/1jNQtGEM8GGwvFXaM7k_1M5QySWlzy08E" target="_blank" rel="noopener noreferrer" class="text-blue-700 font-semibold underline hover:text-blue-800">
+              Folder Database Laporan Insiden SPT Group ↗
+            </a>
+          </p>
+        </div>
+        <div class="flex items-center gap-2 self-end sm:self-auto">
+          <span id="autosave-time" class="text-[11px] text-slate-400 font-medium">Baru saja</span>
+          <button type="button" onclick="openDriveModal()" class="text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 transition">
+            ⚙️ Pengaturan DB Drive
+          </button>
+        </div>
+      </div>
+
+      <form id="incident-form" onsubmit="event.preventDefault();">
+        <!-- ==================================================================
+             BAGIAN 0: IDENTITAS DOKUMEN & STATUS
+             ================================================================== -->
+        <section id="sec-meta" class="section-card">
+          <button type="button" class="section-header-btn" onclick="toggleSection('body-meta', this)">
+            <div class="flex items-center gap-2.5">
+              <span class="w-7 h-7 rounded-lg bg-slate-900 text-white text-xs font-bold flex items-center justify-center">0</span>
+              <div>
+                <h2 class="text-sm sm:text-base font-bold text-slate-900">Identitas Dokumen &amp; Status Laporan</h2>
+                <p class="text-xs text-slate-500">Nomor registrasi otomatis, tanggal pelaporan &amp; status dokumen</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span id="badge-meta" class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Lengkap</span>
+              <span class="chevron-mobile text-slate-400 text-sm">▼</span>
+            </div>
+          </button>
+          <div id="body-meta" class="section-body">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-3">
+              <div>
+                <label for="doc-ref" class="block text-xs font-bold uppercase tracking-wide text-slate-600 mb-1">Nomor Referensi Laporan</label>
+                <div class="flex gap-1.5">
+                  <input type="text" id="doc-ref" class="font-mono font-bold text-blue-900 bg-slate-50" readonly />
+                  <button type="button" onclick="regenerateRefNumber()" class="px-3 rounded-xl border border-slate-300 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold shrink-0" title="Buat nomor baru">🔄</button>
+                </div>
+              </div>
+              <div>
+                <label for="doc-date" class="block text-xs font-bold uppercase tracking-wide text-slate-600 mb-1">Tanggal Pembuatan Laporan</label>
+                <input type="date" id="doc-date" required />
+              </div>
+              <div>
+                <label for="doc-status" class="block text-xs font-bold uppercase tracking-wide text-slate-600 mb-1">Status Dokumen</label>
+                <select id="doc-status">
+                  <option value="Draft">📝 Draft (Konsep Awal)</option>
+                  <option value="Terkirim" selected>📤 Terkirim (Submitted ke HSE/KTT)</option>
+                  <option value="Dalam Investigasi">🔍 Dalam Investigasi Lanjut</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             BAGIAN 1: WHAT (APA YANG TERJADI)
+             ================================================================== -->
+        <section id="sec-what" class="section-card">
+          <button type="button" class="section-header-btn" onclick="toggleSection('body-what', this)">
+            <div class="flex items-center gap-2.5">
+              <span class="w-7 h-7 rounded-lg bg-red-600 text-white text-xs font-bold flex items-center justify-center">W1</span>
+              <div>
+                <h2 class="text-sm sm:text-base font-bold text-slate-900">WHAT — Apa yang Terjadi?</h2>
+                <p class="text-xs text-slate-500">Kategori insiden, tingkat keparahan, judul &amp; deskripsi dampak</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span id="badge-what" class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800">Belum Lengkap</span>
+              <span class="chevron-mobile text-slate-400 text-sm">▼</span>
+            </div>
+          </button>
+          <div id="body-what" class="section-body">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-3">
+              <div>
+                <label for="what-category" class="block text-xs font-bold uppercase tracking-wide text-slate-600 mb-1">Kategori Insiden <span class="text-red-600">*</span></label>
+                <select id="what-category">
+                  <option value="">-- Pilih Kategori Insiden --</option>
+                  <option value="Near Miss (Hampir Celaka)">Near Miss (Hampir Celaka)</option>
+                  <option value="First Aid Injury (FAI - P3K)">First Aid Injury (FAI - Perawatan P3K)</option>
+                  <option value="Medical Treatment Case (MTC)">Medical Treatment Case (MTC - Perawatan Medis)</option>
+                  <option value="Restricted Work Case (RWC)">Restricted Work Case (RWC - Kerja Terbatas)</option>
+                  <option value="Lost Time Injury (LTI - Cedera Hilang Hari Kerja)">Lost Time Injury (LTI - Cedera Hilang Hari Kerja)</option>
+                  <option value="Property Damage (Kerusakan Aset / Unit)">Property Damage (Kerusakan Aset / Unit Alat Berat)</option>
+                  <option value="Environmental Incident (Tumpahan / Lingkungan)">Environmental Incident (Tumpahan B3 / Lingkungan)</option>
+                  <option value="Fire / Explosion (Kebakaran / Ledakan)">Fire / Explosion (Kebakaran / Ledakan)</option>
+                  <option value="Fatality (Kematian)">Fatality (Kematian)</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="what-title" class="block text-xs font-bold uppercase tracking-wide text-slate-600 mb-1">Judul Singkat Kejadian <span class="text-red-600">*</span></label>
+                <input type="text" id="what-title" placeholder="Contoh: Unit Dump Truck DT-14 Tergelincir di Tikungan Haul Road KM 08" />
+              </div>
+            </div>
+
+            <!-- Tingkat Keparahan -->
+            <div class="mt-3.5">
+              <span class="block text-xs font-bold uppercase tracking-wide text-slate-600 mb-1.5">Tingkat Keparahan Aktual / Potensial <span class="text-red-600">*</span></span>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                <label class="sev-option sev-ringan cursor-pointer">
+                  <input type="radio" name="what-severity" value="Ringan" class="sr-only" />
+                  <div class="sev-box border border-slate-300 rounded-xl p-2.5 text-center transition bg-white">
+                    <div class="text-sm font-extrabold">🟢 Ringan</div>
+                    <div class="text-[11px] text-slate-500 mt-0.5">Minor / Near Miss</div>
+                  </div>
+                </label>
+                <label class="sev-option sev-sedang cursor-pointer">
+                  <input type="radio" name="what-severity" value="Sedang" class="sr-only" checked />
+                  <div class="sev-box border border-slate-300 rounded-xl p-2.5 text-center transition bg-white">
+                    <div class="text-sm font-extrabold">🟡 Sedang</div>
+                    <div class="text-[11px] text-slate-500 mt-0.5">MTC / Kerusakan Ringan</div>
+                  </div>
+                </label>
+                <label class="sev-option sev-berat cursor-pointer">
+                  <input type="radio" name="what-severity" value="Berat" class="sr-only" />
+                  <div class="sev-box border border-slate-300 rounded-xl p-2.5 text-center transition bg-white">
+                    <div class="text-sm font-extrabold">🟠 Berat</div>
+                    <div class="text-[11px] text-slate-500 mt-0.5">LTI / Kerusakan Mayor</div>
+                  </div>
+                </label>
+                <label class="sev-option sev-kritis cursor-pointer">
+                  <input type="radio" name="what-severity" value="Kritis" class="sr-only" />
+                  <div class="sev-box border border-slate-300 rounded-xl p-2.5 text-center transition bg-white">
+                    <div class="text-sm font-extrabold">🔴 Kritis</div>
+                    <div class="text-[11px] text-slate-500 mt-0.5">Fatality / Bencana</div>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div class="mt-3.5">
+              <label for="what-desc" class="block text-xs font-bold uppercase tracking-wide text-slate-600 mb-1">Deskripsi Kejadian &amp; Dampak Kerugian / Cedera <span class="text-red-600">*</span></label>
+              <textarea id="what-desc" rows="3" placeholder="Jelaskan secara ringkas dan faktual apa yang terjadi, bagian unit/aset yang terdampak, atau cedera awal yang dialami..."></textarea>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             BAGIAN 2: WHEN (KAPAN TERJADI)
+             ================================================================== -->
+        <section id="sec-when" class="section-card">
+          <button type="button" class="section-header-btn" onclick="toggleSection('body-when', this)">
+            <div class="flex items-center gap-2.5">
+              <span class="w-7 h-7 rounded-lg bg-blue-700 text-white text-xs font-bold flex items-center justify-center">W2</span>
+              <div>
+                <h2 class="text-sm sm:text-base font-bold text-slate-900">WHEN — Kapan Insiden Terjadi?</h2>
+                <p class="text-xs text-slate-500">Tanggal kejadian, waktu akurat &amp; shift kerja operasional</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span id="badge-when" class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800">Belum Lengkap</span>
+              <span class="chevron-mobile text-slate-400 text-sm">▼</span>
+            </div>
+          </button>
+          <div id="body-when" class="section-body">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-3">
+              <div>
+                <label for="when-date" class="block text-xs font-bold uppercase tracking-wide text-slate-600 mb-1">Tanggal Kejadian <span class="text-red-600">*</span></label>
+                <input type="date" id="when-date" />
+              </div>
+              <div>
+                <label for="when-time" class="block text-xs font-bold uppercase tracking-wide text-slate-600 mb-1">Waktu Kejadian (WITA/WIB) <span class="text-red-600">*</span></label>
+                <input type="time" id="when-time" />
+              </div>
+              <div>
+                <label for="when-shift" class="block text-xs font-bold uppercase tracking-wide text-slate-600 mb-1">Shift Kerja</label>
+                <select id="when-shift">
+                  <option value="Shift 1 (Siang / Day Shift)">Shift 1 (Siang / Day Shift)</option>
+                  <option value="Shift 2 (Malam / Night Shift)">Shift 2 (Malam / Night Shift)</option>
+                  <option value="Non-Shift / General">Non-Shift / General</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             BAGIAN 3: WHERE (DI MANA TERJADI)
+             ================================================================== -->
+        <section id="sec-where" class="section-card">
+          <button type="button" class="section-header-btn" onclick="toggleSection('body-where', this)">
+            <div class="flex items-center gap-2.5">
+              <span class="w-7 h-7 rounded-lg bg-blue-700 text-white text-xs font-bold flex items-center justify-center">W3</span>
+              <div>
+                <h2 class="text-sm sm:text-base font-bold text-slate-900">WHERE — Di Mana Lokasi Kejadian?</h2>
+                <p class="text-xs text-slate-500">Site / area spesifik, patokan koordinat &amp; kondisi cuaca/lingkungan</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span id="badge-where" class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800">Belum Lengkap</span>
+              <span class="chevron-mobile text-slate-400 text-sm">▼</span>
+            </div>
+          </button>
+          <div id="body-where" class="section-body">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-3">
+              <div>
+                <label for="where-area" class="block text-xs font-bold uppercase tracking-wide text-slate-600 mb-1">Site / Area Kerja Spesifik <span class="text-red-600">*</span></label>
+                <input type="text" id="where-area" placeholder="Contoh: Pit Utara Blok B / Workshop Utama / Haul Road KM 08" />
+              </div>
+              <div>
+                <label for="where-condition" class="block text-xs font-bold uppercase tracking-wide text-slate-600 mb-1">Patokan Lokasi &amp; Kondisi Lingkungan/Cuaca</label>
+                <input type="text" id="where-condition" placeholder="Contoh: Dekat pos pantau 2, jalan basah gerimis, pencahayaan redup" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             BAGIAN 4: WHO (SIAPA SAJA YANG TERLIBAT & SAKSI)
+             ================================================================== -->
+        <section id="sec-who" class="section-card">
+          <button type="button" class="section-header-btn" onclick="toggleSection('body-who', this)">
+            <div class="flex items-center gap-2.5">
+              <span class="w-7 h-7 rounded-lg bg-blue-700 text-white text-xs font-bold flex items-center justify-center">W4</span>
+              <div>
+                <h2 class="text-sm sm:text-base font-bold text-slate-900">WHO — Siapa yang Terlibat &amp; Saksi Mata?</h2>
+                <p class="text-xs text-slate-500">Daftar dinamis personel terlibat, status medis &amp; keterangan saksi</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span id="badge-who" class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800">Belum Lengkap</span>
+              <span class="chevron-mobile text-slate-400 text-sm">▼</span>
+            </div>
+          </button>
+          <div id="body-who" class="section-body">
+            <div class="pt-3">
+              <div class="flex items-center justify-between gap-2 mb-2.5">
+                <span class="text-xs font-bold uppercase tracking-wide text-slate-600">Daftar Personel Terlibat / Korban / Operator</span>
+                <button
+                  type="button"
+                  onclick="addPersonnelRow()"
+                  class="px-3 py-1.5 rounded-xl text-xs font-bold bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 transition flex items-center gap-1"
+                >
+                  <span>＋</span> Tambah Personel
+                </button>
+              </div>
+
+              <!-- Dynamic Personnel List (Stacked cards on mobile, clean grid on desktop) -->
+              <div id="personnel-list" class="space-y-2.5"></div>
+
+              <div class="mt-3.5">
+                <label for="who-witness" class="block text-xs font-bold uppercase tracking-wide text-slate-600 mb-1">Catatan Saksi Mata (Nama, Jabatan &amp; Ringkasan Kesaksian)</label>
+                <textarea id="who-witness" rows="2" placeholder="Contoh: Sdr. Budi Santoso (Pengawas Lapangan) melihat unit mulai selip sekitar 15 meter sebelum tanggul pengaman..."></textarea>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             BAGIAN 5: WHY (MENGAPA TERJADI - ANALISIS PENYEBAB AWAL)
+             ================================================================== -->
+        <section id="sec-why" class="section-card">
+          <button type="button" class="section-header-btn" onclick="toggleSection('body-why', this)">
+            <div class="flex items-center gap-2.5">
+              <span class="w-7 h-7 rounded-lg bg-blue-700 text-white text-xs font-bold flex items-center justify-center">W5</span>
+              <div>
+                <h2 class="text-sm sm:text-base font-bold text-slate-900">WHY — Mengapa Terjadi (Dugaan Penyebab Awal)?</h2>
+                <p class="text-xs text-slate-500">Faktor tindakan tidak aman, kondisi tidak aman &amp; penjelasan awal</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span id="badge-why" class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800">Belum Lengkap</span>
+              <span class="chevron-mobile text-slate-400 text-sm">▼</span>
+            </div>
+          </button>
+          <div id="body-why" class="section-body">
+            <div class="pt-3">
+              <span class="block text-xs font-bold uppercase tracking-wide text-slate-600 mb-2">Faktor Penyebab Langsung Teridentifikasi (Pilih yang sesuai)</span>
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                <label class="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-slate-100 cursor-pointer text-xs sm:text-sm">
+                  <input type="checkbox" name="why-factor" value="Kondisi Jalan / Area Licin atau Rusak" class="w-4 h-4 rounded text-blue-600" />
+                  <span>Kondisi Jalan / Area Licin atau Rusak</span>
+                </label>
+                <label class="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-slate-100 cursor-pointer text-xs sm:text-sm">
+                  <input type="checkbox" name="why-factor" value="Kurang Antisipasi / Kecepatan Tidak Sesuai" class="w-4 h-4 rounded text-blue-600" />
+                  <span>Kurang Antisipasi / Kecepatan Tidak Sesuai</span>
+                </label>
+                <label class="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-slate-100 cursor-pointer text-xs sm:text-sm">
+                  <input type="checkbox" name="why-factor" value="Prosedur / JSA / SOP Tidak Diikuti" class="w-4 h-4 rounded text-blue-600" />
+                  <span>Prosedur / JSA / SOP Tidak Diikuti</span>
+                </label>
+                <label class="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-slate-100 cursor-pointer text-xs sm:text-sm">
+                  <input type="checkbox" name="why-factor" value="Kegagalan Mekanis / Kerusakan Alat" class="w-4 h-4 rounded text-blue-600" />
+                  <span>Kegagalan Mekanis / Kerusakan Alat</span>
+                </label>
+                <label class="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-slate-100 cursor-pointer text-xs sm:text-sm">
+                  <input type="checkbox" name="why-factor" value="APD Tidak Lengkap / Tidak Sesuai Standar" class="w-4 h-4 rounded text-blue-600" />
+                  <span>APD Tidak Lengkap / Tidak Sesuai Standar</span>
+                </label>
+                <label class="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-slate-100 cursor-pointer text-xs sm:text-sm">
+                  <input type="checkbox" name="why-factor" value="Faktor Kelelahan (Fatigue) / Kurang Fokus" class="w-4 h-4 rounded text-blue-600" />
+                  <span>Faktor Kelelahan (Fatigue) / Kurang Fokus</span>
+                </label>
+              </div>
+
+              <div class="mt-3.5">
+                <label for="why-desc" class="block text-xs font-bold uppercase tracking-wide text-slate-600 mb-1">Penjelasan Dugaan Penyebab Awal <span class="text-red-600">*</span></label>
+                <textarea id="why-desc" rows="2" placeholder="Uraikan temuan awal di lokasi terkait pemicu utama insiden sebelum investigasi mendalam..."></textarea>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             BAGIAN 6: HOW (BAGAIMANA KRONOLOGIS KEJADIAN)
+             ================================================================== -->
+        <section id="sec-how" class="section-card">
+          <button type="button" class="section-header-btn" onclick="toggleSection('body-how', this)">
+            <div class="flex items-center gap-2.5">
+              <span class="w-7 h-7 rounded-lg bg-amber-600 text-white text-xs font-bold flex items-center justify-center">1H</span>
+              <div>
+                <h2 class="text-sm sm:text-base font-bold text-slate-900">HOW — Bagaimana Kronologis Kejadian?</h2>
+                <p class="text-xs text-slate-500">Urutan waktu kejadian dari sebelum, saat insiden, hingga pasca-kejadian</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span id="badge-how" class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800">Belum Lengkap</span>
+              <span class="chevron-mobile text-slate-400 text-sm">▼</span>
+            </div>
+          </button>
+          <div id="body-how" class="section-body">
+            <div class="pt-3">
+              <label for="how-chronology" class="block text-xs font-bold uppercase tracking-wide text-slate-600 mb-1">Uraian Kronologis Kejadian (Urutan Waktu) <span class="text-red-600">*</span></label>
+              <textarea id="how-chronology" rows="4" placeholder="Contoh:&#10;- Pukul 14.10: Unit DT-14 bermuatan melintas dari arah Pit Utara menuju ROM Stockpile.&#10;- Pukul 14.15: Saat memasuki tikungan menurun KM 08 yang licin pasca gerimis, roda belakang selip ke sisi kiri.&#10;- Pukul 14.16: Unit berhenti tertahan tanggul pengaman (safety berm) tanpa terguling. Operator keluar dalam kondisi selamat."></textarea>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             BAGIAN 7: TINDAKAN SEGERA, DOKUMENTASI FOTO & PENGESAHAN
+             ================================================================== -->
+        <section id="sec-action" class="section-card">
+          <button type="button" class="section-header-btn" onclick="toggleSection('body-action', this)">
+            <div class="flex items-center gap-2.5">
+              <span class="w-7 h-7 rounded-lg bg-emerald-700 text-white text-xs font-bold flex items-center justify-center">🛡️</span>
+              <div>
+                <h2 class="text-sm sm:text-base font-bold text-slate-900">Tindakan Segera, Dokumentasi Foto &amp; Pengesahan</h2>
+                <p class="text-xs text-slate-500">Mitigasi darurat, bukti foto lapangan (maks. 3) &amp; pejabat pengesah</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span id="badge-action" class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700">Opsional</span>
+              <span class="chevron-mobile text-slate-400 text-sm">▼</span>
+            </div>
+          </button>
+          <div id="body-action" class="section-body">
+            <div class="pt-3">
+              <span class="block text-xs font-bold uppercase tracking-wide text-slate-600 mb-2">Tindakan Darurat / Pengamanan Awal yang Telah Dilakukan</span>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <label class="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-200 bg-slate-50/70 cursor-pointer text-xs sm:text-sm">
+                  <input type="checkbox" name="immediate-action" value="Isolasi / Barikade Area Kejadian (Safety Line)" class="w-4 h-4 rounded text-emerald-600" />
+                  <span>Isolasi / Barikade Area Kejadian (Safety Line)</span>
+                </label>
+                <label class="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-200 bg-slate-50/70 cursor-pointer text-xs sm:text-sm">
+                  <input type="checkbox" name="immediate-action" value="Pertolongan Pertama (P3K) / Evakuasi Medis ke Klinik" class="w-4 h-4 rounded text-emerald-600" />
+                  <span>Pertolongan Pertama (P3K) / Evakuasi Medis ke Klinik</span>
+                </label>
+                <label class="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-200 bg-slate-50/70 cursor-pointer text-xs sm:text-sm">
+                  <input type="checkbox" name="immediate-action" value="Penghentian Sementara Aktivitas / Lock Out Tag Out (LOTO)" class="w-4 h-4 rounded text-emerald-600" />
+                  <span>Penghentian Sementara Aktivitas / LOTO Unit</span>
+                </label>
+                <label class="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-200 bg-slate-50/70 cursor-pointer text-xs sm:text-sm">
+                  <input type="checkbox" name="immediate-action" value="Pelaporan Langsung ke Pengawas, HSE & KTT/PJO" class="w-4 h-4 rounded text-emerald-600" />
+                  <span>Pelaporan Langsung ke Pengawas, HSE &amp; KTT/PJO</span>
+                </label>
+              </div>
+
+              <div class="mt-3">
+                <label for="action-notes" class="block text-xs font-bold uppercase tracking-wide text-slate-600 mb-1">Catatan Tambahan Tindakan Perbaikan Segera</label>
+                <input type="text" id="action-notes" placeholder="Contoh: Pemasangan rambu peringatan licin dan perapihan tanggul oleh unit Grader..." />
+              </div>
+
+              <!-- Upload Foto Bukti (Maks 3 Foto dengan Kompresi Canvas) -->
+              <div class="mt-4 pt-3.5 border-t border-slate-100">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                  <div>
+                    <span class="block text-xs font-bold uppercase tracking-wide text-slate-700">Dokumentasi Foto Bukti Lapangan (Maks. 3 Foto)</span>
+                    <span class="text-[11px] text-slate-500">Otomatis dikompresi agar ringan untuk cetak A4 &amp; upload ke Google Drive</span>
+                  </div>
+                  <label class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white cursor-pointer transition shadow-sm">
+                    <span>📷</span> Pilih / Ambil Foto
+                    <input type="file" id="photo-input" accept="image/*" multiple class="hidden" onchange="handlePhotoUpload(event)" />
+                  </label>
+                </div>
+                <div id="photo-preview-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2"></div>
+              </div>
+
+              <!-- Data Pejabat Pengesahan 3 Pihak -->
+              <div class="mt-4 pt-3.5 border-t border-slate-100">
+                <span class="block text-xs font-bold uppercase tracking-wide text-slate-700 mb-2.5">Data Pihak Pelapor &amp; Pengesahan (Untuk Dokumen Cetak &amp; Arsip)</span>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                    <span class="text-[11px] font-bold text-slate-500 uppercase">1. Pelapor / Pengawas</span>
+                    <input type="text" id="sig-reporter-name" placeholder="Nama Lengkap Pelapor" class="mt-1.5 mb-1.5" />
+                    <input type="text" id="sig-reporter-role" placeholder="Jabatan (mis. Foreman Produksi)" />
+                  </div>
+                  <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                    <span class="text-[11px] font-bold text-slate-500 uppercase">2. Diverifikasi Oleh</span>
+                    <input type="text" id="sig-hse-name" placeholder="Nama HSE Officer / Coordinator" class="mt-1.5 mb-1.5" />
+                    <input type="text" id="sig-hse-role" value="HSE Officer / Coordinator" />
+                  </div>
+                  <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                    <span class="text-[11px] font-bold text-slate-500 uppercase">3. Diketahui / Disetujui</span>
+                    <input type="text" id="sig-ktt-name" placeholder="Nama KTT / PJO / Site Manager" class="mt-1.5 mb-1.5" />
+                    <input type="text" id="sig-ktt-role" value="KTT / PJO / Site Manager" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             BAGIAN 8: PANEL RESUME AI (GEMINI + SMART TEMPLATE OFFLINE)
+             ================================================================== -->
+        <section id="sec-ai" class="section-card border-indigo-200">
+          <button type="button" class="section-header-btn bg-indigo-50/40" onclick="toggleSection('body-ai', this)">
+            <div class="flex items-center gap-2.5">
+              <span class="w-7 h-7 rounded-lg bg-indigo-600 text-white text-xs font-bold flex items-center justify-center">AI</span>
+              <div>
+                <h2 class="text-sm sm:text-base font-bold text-indigo-950">Resume Eksekutif AI (Siap Kirim KTT &amp; Cetak A4)</h2>
+                <p class="text-xs text-indigo-700/80">Ringkasan profesional otomatis berbasis Gemini AI + cadangan offline</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span id="ai-mode-badge" class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800">Siap Generate</span>
+              <span class="chevron-mobile text-slate-400 text-sm">▼</span>
+            </div>
+          </button>
+          <div id="body-ai" class="section-body">
+            <div class="pt-3">
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+                <button
+                  type="button"
+                  id="btn-generate-ai"
+                  onclick="generateExecutiveResume()"
+                  class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition flex items-center gap-2"
+                >
+                  <span>✨</span> Buat Resume Eksekutif Sekarang
+                </button>
+                <div class="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onclick="copyAiResume()"
+                    class="px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 transition"
+                  >
+                    📋 Salin Resume
+                  </button>
+                </div>
+              </div>
+              <textarea
+                id="ai-resume-output"
+                rows="4"
+                placeholder="Klik tombol 'Buat Resume Eksekutif Sekarang' untuk merangkum seluruh data 5W+1H secara otomatis. Hasil di kotak ini dapat Anda sunting manual dan otomatis tercantum pada dokumen Cetak A4 serta Database Google Drive..."
+              ></textarea>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             DESKTOP BOTTOM ACTION BAR (TERMASUK UPLOAD KE GOOGLE DRIVE)
+             ================================================================== -->
+        <div class="hidden md:flex items-center justify-between gap-3 bg-white border border-slate-200 rounded-2xl p-4 shadow-sm mt-4">
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              onclick="confirmResetForm()"
+              class="px-3.5 py-2.5 rounded-xl text-xs font-semibold text-red-600 hover:bg-red-50 border border-red-200 transition"
+            >
+              🗑️ Reset Formulir
+            </button>
+            <button
+              type="button"
+              onclick="copyWhatsAppSummary()"
+              class="px-3.5 py-2.5 rounded-xl text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 transition"
+            >
+              📲 Salin Ringkasan WA
+            </button>
+          </div>
+
+          <div class="flex items-center gap-2.5">
+            <button
+              type="button"
+              onclick="openDriveModal()"
+              class="px-4 py-2.5 rounded-xl text-xs font-bold bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-300 transition flex items-center gap-2"
+            >
+              <svg class="w-4 h-4 text-[#1A73E8]" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M7.71 3.5L1.15 15l3.43 6 6.55-11.5L7.71 3.5zm1.73 0l6.55 11.5h6.86L16.29 3.5H9.44zm5.98 12.5H2.87l-1.72 3h13.7l3.43-6-2.86 3z"/>
+              </svg>
+              <span>Upload ke Database Drive</span>
+            </button>
+            <button
+              type="button"
+              onclick="prepareAndPrint()"
+              class="px-5 py-2.5 rounded-xl text-xs font-bold bg-[#0F294A] hover:bg-blue-900 text-white shadow-md transition flex items-center gap-2"
+            >
+              <span>🖨️</span> Pratinjau Cetak A4
+            </button>
+          </div>
+        </div>
+      </form>
+    </main>
+
+    <!-- ========================================================================
+         FLOATING BOTTOM ACTION BAR MOBILE (<768px)
+         ======================================================================== -->
+    <div class="mobile-bottom-bar md:hidden">
+      <div class="flex items-center gap-2 max-w-lg mx-auto">
+        <button
+          type="button"
+          onclick="triggerDriveUploadAction()"
+          class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold bg-[#1A73E8] active:bg-blue-700 text-white shadow-sm flex items-center justify-center gap-1.5 relative"
+        >
+          <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M7.71 3.5L1.15 15l3.43 6 6.55-11.5L7.71 3.5zm1.73 0l6.55 11.5h6.86L16.29 3.5H9.44zm5.98 12.5H2.87l-1.72 3h13.7l3.43-6-2.86 3z"/>
+          </svg>
+          <span>Upload Drive</span>
+          <span id="mobile-queue-badge" class="hidden px-1.5 py-0.2 text-[10px] font-extrabold rounded-full bg-amber-400 text-slate-950">0</span>
+        </button>
+
+        <button
+          type="button"
+          onclick="prepareAndPrint()"
+          class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold bg-[#0F294A] active:bg-slate-800 text-white shadow-sm flex items-center justify-center gap-1.5"
+        >
+          <span>🖨️</span> Cetak A4
+        </button>
+
+        <button
+          type="button"
+          onclick="toggleMobileMoreSheet(true)"
+          class="py-2.5 px-3 rounded-xl text-xs font-bold bg-slate-100 active:bg-slate-200 text-slate-800 border border-slate-300"
+          aria-label="Menu utilitas lainnya"
+        >
+          •••
+        </button>
+      </div>
+    </div>
+
+    <!-- ========================================================================
+         MOBILE MORE UTILITIES SHEET
+         ======================================================================== -->
+    <div id="mobile-more-sheet" class="fixed inset-0 z-50 hidden">
+      <div class="absolute inset-0 bg-slate-950/50 backdrop-blur-xs" onclick="toggleMobileMoreSheet(false)"></div>
+      <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl p-5 shadow-2xl border-t border-slate-200 space-y-2.5">
+        <div class="w-10 h-1 bg-slate-300 rounded-full mx-auto mb-3"></div>
+        <h3 class="text-sm font-bold text-slate-900 mb-2">Utilitas Laporan SPT Group</h3>
+        <button type="button" onclick="toggleMobileMoreSheet(false); openDriveModal();" class="w-full py-3 px-4 rounded-xl text-left text-sm font-semibold bg-blue-50 text-blue-900 border border-blue-200 flex items-center justify-between">
+          <span>☁️ Pengaturan &amp; Antrean Database Google Drive</span>
+          <span>→</span>
+        </button>
+        <button type="button" onclick="toggleMobileMoreSheet(false); copyWhatsAppSummary();" class="w-full py-3 px-4 rounded-xl text-left text-sm font-semibold bg-emerald-50 text-emerald-900 border border-emerald-200 flex items-center justify-between">
+          <span>📲 Salin Ringkasan WhatsApp</span>
+          <span>→</span>
+        </button>
+        <button type="button" onclick="toggleMobileMoreSheet(false); fillSampleData();" class="w-full py-3 px-4 rounded-xl text-left text-sm font-semibold bg-slate-100 text-slate-800 flex items-center justify-between">
+          <span>✨ Isi Contoh Data Lapangan</span>
+          <span>→</span>
+        </button>
+        <button type="button" onclick="toggleMobileMoreSheet(false); confirmResetForm();" class="w-full py-3 px-4 rounded-xl text-left text-sm font-semibold bg-red-50 text-red-700 border border-red-200 flex items-center justify-between">
+          <span>🗑️ Reset / Kosongkan Formulir</span>
+          <span>→</span>
+        </button>
+        <button type="button" onclick="toggleMobileMoreSheet(false);" class="w-full py-2.5 text-center text-xs font-bold text-slate-500 mt-1">
+          Tutup Menu
+        </button>
+      </div>
+    </div>
+
+    <!-- ========================================================================
+         MODAL / DRAWER: DATABASE GOOGLE DRIVE - SPT GROUP
+         Folder Target: "Database Laporan Insiden SPT Group"
+         Folder ID: 1jNQtGEM8GGwvFXaM7k_1M5QySWlzy08E
+         ======================================================================== -->
+    <div id="drive-modal" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="drive-modal-title">
+      <div class="min-h-screen px-3 py-6 flex items-end sm:items-center justify-center">
+        <div class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs transition-opacity" onclick="closeDriveModal()"></div>
+
+        <div class="relative bg-white w-full max-w-2xl rounded-3xl shadow-2xl border border-slate-200 overflow-hidden z-10">
+          <!-- Modal Header -->
+          <div class="bg-gradient-to-r from-[#0F294A] via-[#1E3A8A] to-[#1A73E8] text-white px-5 py-4 flex items-start justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-2xl bg-white/15 border border-white/25 flex items-center justify-center shrink-0">
+                <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M7.71 3.5L1.15 15l3.43 6 6.55-11.5L7.71 3.5zm1.73 0l6.55 11.5h6.86L16.29 3.5H9.44zm5.98 12.5H2.87l-1.72 3h13.7l3.43-6-2.86 3z"/>
+                </svg>
+              </div>
+              <div>
+                <h3 id="drive-modal-title" class="text-base sm:text-lg font-extrabold leading-tight">
+                  Database Google Drive — SPT Group
+                </h3>
+                <p class="text-xs text-blue-100 mt-0.5">
+                  Folder: <strong>Database Laporan Insiden SPT Group</strong>
+                </p>
+              </div>
+            </div>
+            <button type="button" onclick="closeDriveModal()" class="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-sm font-bold" aria-label="Tutup modal">✕</button>
+          </div>
+
+          <!-- Modal Body -->
+          <div class="p-4 sm:p-5 space-y-4 max-h-[80vh] overflow-y-auto">
+            <!-- Info Folder Google Drive -->
+            <div class="p-3.5 rounded-2xl bg-blue-50/80 border border-blue-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-xs font-bold text-blue-950">📁 Database Laporan Insiden SPT Group</span>
+                  <span id="drive-conn-status" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                    Mode Arsip / Belum Terhubung Web App
+                  </span>
+                </div>
+                <p class="text-[11px] font-mono text-slate-600 mt-1 truncate">
+                  Folder ID: 1jNQtGEM8GGwvFXaM7k_1M5QySWlzy08E
+                </p>
+              </div>
+              <a
+                href="https://drive.google.com/drive/folders/1jNQtGEM8GGwvFXaM7k_1M5QySWlzy08E"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="shrink-0 inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-white hover:bg-blue-50 text-blue-700 border border-blue-300 shadow-2xs transition"
+              >
+                <span>📂</span> Buka Folder Google Drive ↗
+              </a>
+            </div>
+
+            <!-- METODE A: UPLOAD OTOMATIS VIA APPS SCRIPT WEB APP -->
+            <div class="p-4 rounded-2xl border border-slate-200 bg-white shadow-2xs space-y-3">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <span class="inline-block text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 mb-1">
+                    Metode 1 • Rekomendasi Tim Lapangan (1-Klik Otomatis)
+                  </span>
+                  <h4 class="text-sm font-bold text-slate-900">Kirim Langsung ke Folder Drive &amp; Log Google Sheets</h4>
+                  <p class="text-xs text-slate-500 mt-0.5">
+                    Mengirim dokumen laporan A4, foto bukti terkompresi, dan mencatat baris baru ke spreadsheet log otomatis tanpa perlu login Google berulang di HP lapangan.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Action Button Upload Now -->
+              <div class="flex flex-col sm:flex-row gap-2">
+                <button
+                  type="button"
+                  id="btn-execute-cloud-upload"
+                  onclick="uploadToGoogleDriveCloud()"
+                  class="flex-1 py-3 px-4 rounded-xl text-xs sm:text-sm font-bold bg-[#1A73E8] hover:bg-blue-700 text-white shadow-md transition flex items-center justify-center gap-2"
+                >
+                  <span>☁️</span> Upload Laporan Sekarang ke Google Drive
+                </button>
+                <button
+                  type="button"
+                  onclick="queueReportForOfflineSync()"
+                  class="py-3 px-3.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 transition flex items-center justify-center gap-1.5"
+                  title="Simpan ke daftar antrean jika sinyal tambang/site sedang lemah"
+                >
+                  <span>📥</span> Simpan Antrean Offline
+                </button>
+              </div>
+
+              <!-- Upload Result Feedback Box -->
+              <div id="drive-upload-feedback" class="hidden p-3 rounded-xl text-xs"></div>
+
+              <!-- Pengaturan URL Web App -->
+              <details id="apps-script-config-details" class="pt-2 border-t border-slate-100">
+                <summary class="text-xs font-bold text-slate-700 cursor-pointer hover:text-blue-700 select-none">
+                  ⚙️ Konfigurasi URL Web App Google Apps Script &amp; Salin Kode Server
+                </summary>
+                <div class="mt-3 space-y-2.5">
+                  <div>
+                    <label for="drive-webapp-url" class="block text-[11px] font-bold uppercase text-slate-600 mb-1">
+                      URL Web App Apps Script (Berakhiran /exec)
+                    </label>
+                    <div class="flex flex-col sm:flex-row gap-2">
+                      <input
+                        type="url"
+                        id="drive-webapp-url"
+                        placeholder="https://script.google.com/macros/s/AKfycb.../exec"
+                        class="text-xs font-mono"
+                      />
+                      <button
+                        type="button"
+                        onclick="saveWebAppUrl()"
+                        class="px-4 py-2.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shrink-0"
+                      >
+                        Simpan URL
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="p-3 rounded-xl bg-slate-900 text-slate-200 text-[11px] space-y-2">
+                    <div class="flex items-center justify-between gap-2">
+                      <span class="font-semibold text-amber-300">Kode Google Apps Script Siap Pakai (Folder ID Terpasang):</span>
+                      <button
+                        type="button"
+                        onclick="copyAppsScriptCode()"
+                        class="px-2.5 py-1 rounded-lg bg-white/15 hover:bg-white/25 text-white font-bold text-[11px] transition"
+                      >
+                        📋 Salin Kode Script (1-Klik)
+                      </button>
+                    </div>
+                    <p class="text-slate-400 leading-relaxed">
+                      Cara pasang (1 menit): Buka <span class="text-white underline">script.google.com</span> → Proyek Baru → Tempel kode → Klik <strong>Terapkan (Deploy) &gt; Deployment Baru &gt; Aplikasi Web</strong> (Akses: <em>Siapa saja / Anyone</em>) → Salin URL <code class="text-emerald-300">/exec</code> ke kolom di atas.
+                    </p>
+                  </div>
+                </div>
+              </details>
+            </div>
+
+            <!-- METODE B: MODE LANGSUNG / FALLBACK OFFLINE (EKSPOR ARSIP + BUKA FOLDER) -->
+            <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/70 space-y-2.5">
+              <span class="inline-block text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-200 text-slate-800">
+                Metode 2 • Tanpa Setup / Mode Langsung &amp; Offline
+              </span>
+              <h4 class="text-sm font-bold text-slate-900">Unduh Paket Arsip Laporan &amp; Buka Folder Google Drive</h4>
+              <p class="text-xs text-slate-600">
+                Mengunduh file dokumen A4 mandiri (<code class="font-mono text-[11px]">.html</code>) atau rekapan database (<code class="font-mono text-[11px]">.csv</code> / <code class="font-mono text-[11px]">.json</code>) dan membuka folder tujuan Google Drive untuk unggah manual.
+              </p>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
+                <button
+                  type="button"
+                  onclick="downloadArchiveHtmlAndOpenDrive()"
+                  class="sm:col-span-2 py-2.5 px-3.5 rounded-xl text-xs font-bold bg-[#0F294A] hover:bg-blue-900 text-white shadow-xs transition flex items-center justify-center gap-1.5"
+                >
+                  <span>📄</span> Unduh Arsip A4 (.html) &amp; Buka Drive ↗
+                </button>
+                <button
+                  type="button"
+                  onclick="downloadDatabaseCsv()"
+                  class="py-2.5 px-3 rounded-xl text-xs font-bold bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 transition flex items-center justify-center gap-1.5"
+                >
+                  <span>📊</span> Unduh Rekap .CSV
+                </button>
+              </div>
+            </div>
+
+            <!-- DAFTAR ANTREAN SINKRONISASI OFFLINE -->
+            <div id="offline-queue-box" class="hidden p-4 rounded-2xl border border-amber-300 bg-amber-50/80 space-y-2.5">
+              <div class="flex items-center justify-between gap-2">
+                <div>
+                  <h4 class="text-xs sm:text-sm font-extrabold text-amber-950">
+                    ⏳ Antrean Laporan Tertunda (<span id="queue-count-label">0</span> Laporan)
+                  </h4>
+                  <p class="text-[11px] text-amber-800">Tersimpan aman di perangkat. Klik Sync Semua saat sinyal tersedia.</p>
+                </div>
+                <button
+                  type="button"
+                  onclick="syncAllQueuedReports()"
+                  class="px-3 py-2 rounded-xl text-xs font-bold bg-amber-600 hover:bg-amber-700 text-white shadow-2xs shrink-0"
+                >
+                  🔄 Sync Semua Sekarang
+                </button>
+              </div>
+              <div id="offline-queue-list" class="space-y-1.5 max-h-36 overflow-y-auto"></div>
+            </div>
+          </div>
+
+          <!-- Modal Footer -->
+          <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 flex items-center justify-between">
+            <span class="text-[11px] text-slate-500">HSE Digital System • PT SPT Group</span>
+            <button type="button" onclick="closeDriveModal()" class="px-4 py-1.5 rounded-xl text-xs font-bold bg-slate-200 hover:bg-slate-300 text-slate-800">
+              Tutup
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       CONTAINER CETAK A4 KOMPAK 1 KOLOM MURNI (#print-sheet)
+       Hanya tampil saat @media print aktif
+       ======================================================================== -->
+  <div id="print-sheet" aria-hidden="true"></div>
+
+  <!-- ========================================================================
+       JAVASCRIPT VANILLA LENGKAP (DIBUNGKUS TRY...CATCH)
+       ======================================================================== -->
+  <script>
+    try {
+      // ======================================================================
+      // KONSTANTA & STATE APLIKASI
+      // ======================================================================
+      const STORAGE_KEY_DRAFT = 'spt_incident_5w1h_draft_v2';
+      const STORAGE_KEY_DRIVE_URL = 'spt_incident_drive_webapp_url_v1';
+      const STORAGE_KEY_DRIVE_QUEUE = 'spt_incident_drive_offline_queue_v1';
+      const DRIVE_FOLDER_ID = '1jNQtGEM8GGwvFXaM7k_1M5QySWlzy08E';
+      const DRIVE_FOLDER_URL = 'https://drive.google.com/drive/folders/1jNQtGEM8GGwvFXaM7k_1M5QySWlzy08E';
+      const LOGO_PRIMARY_URL = 'https://lh3.googleusercontent.com/d/1jyU7PnF4t0amHGLGMLnqSVBKH4RluMhM';
+      const LOGO_FALLBACK_URL = 'https://drive.google.com/uc?export=view&id=1jyU7PnF4t0amHGLGMLnqSVBKH4RluMhM';
+
+      let uploadedPhotos = []; // Array of { name, dataUrl } max 3
+      let toastTimer = null;
+
+      // ======================================================================
+      // FALLBACK LOGO GOOGLE DRIVE -> SVG
+      // ======================================================================
+      window.handleLogoFallback = function(imgEl) {
+        if (!imgEl.dataset.triedFallback) {
+          imgEl.dataset.triedFallback = 'true';
+          imgEl.src = LOGO_FALLBACK_URL;
+        } else {
+          imgEl.classList.add('hidden');
+          const svgEl = document.getElementById('spt-logo-svg');
+          if (svgEl) svgEl.classList.remove('hidden');
+        }
+      };
+
+      // ======================================================================
+      // TOAST NOTIFICATION SYSTEM (PENGGANTI ALERT)
+      // ======================================================================
+      window.showToast = function(title, msg, type = 'info', duration = 4500) {
+        const box = document.getElementById('toast-box');
+        const content = document.getElementById('toast-content');
+        const icon = document.getElementById('toast-icon');
+        const titleEl = document.getElementById('toast-title');
+        const msgEl = document.getElementById('toast-msg');
+        if (!box || !content) return;
+
+        const styles = {
+          success: { cls: 'bg-emerald-950 text-white border-emerald-700', ico: '✅' },
+          error: { cls: 'bg-red-950 text-white border-red-700', ico: '⚠️' },
+          warning: { cls: 'bg-amber-950 text-white border-amber-700', ico: '⏳' },
+          info: { cls: 'bg-slate-900 text-white border-slate-700', ico: 'ℹ️' }
+        };
+        const chosen = styles[type] || styles.info;
+        content.className = `flex items-start gap-3 px-4 py-3 rounded-2xl shadow-xl border text-sm ${chosen.cls}`;
+        icon.textContent = chosen.ico;
+        titleEl.textContent = title;
+        msgEl.textContent = msg;
+
+        box.classList.remove('hidden');
+        if (toastTimer) clearTimeout(toastTimer);
+        if (duration > 0) {
+          toastTimer = setTimeout(() => {
+            box.classList.add('hidden');
+          }, duration);
+        }
+      };
+
+      window.hideToast = function() {
+        const box = document.getElementById('toast-box');
+        if (box) box.classList.add('hidden');
+      };
+
+      // ======================================================================
+      // NAVIGASI ACCORDION & QUICK JUMP MOBILE
+      // ======================================================================
+      window.toggleSection = function(bodyId, btnEl) {
+        const body = document.getElementById(bodyId);
+        if (!body) return;
+        body.classList.toggle('collapsed');
+        const chev = btnEl ? btnEl.querySelector('.chevron-mobile') : null;
+        if (chev) {
+          chev.textContent = body.classList.contains('collapsed') ? '▶' : '▼';
+        }
+      };
+
+      window.jumpToSection = function(secId) {
+        const sec = document.getElementById(secId);
+        if (!sec) return;
+        const body = sec.querySelector('.section-body');
+        if (body && body.classList.contains('collapsed')) {
+          body.classList.remove('collapsed');
+        }
+        const yOffset = -108;
+        const y = sec.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      };
+
+      window.toggleMobileMoreSheet = function(show) {
+        const sheet = document.getElementById('mobile-more-sheet');
+        if (!sheet) return;
+        if (show) sheet.classList.remove('hidden');
+        else sheet.classList.add('hidden');
+      };
+
+      // ======================================================================
+      // NOMOR REFERENSI & TANGGAL OTOMATIS
+      // ======================================================================
+      function generateRefCode() {
+        const year = new Date().getFullYear();
+        const rand = Math.floor(1000 + Math.random() * 9000);
+        return `SPT-INC-${year}-${rand}`;
+      }
+
+      window.regenerateRefNumber = function() {
+        const refInput = document.getElementById('doc-ref');
+        if (refInput) {
+          refInput.value = generateRefCode();
+          saveFormToLocalStorage();
+          showToast('Nomor Referensi Diperbarui', `Nomor baru: ${refInput.value}`, 'info', 2500);
+        }
+      };
+
+      function getTodayIso() {
+        const now = new Date();
+        const offset = now.getTimezoneOffset();
+        const local = new Date(now.getTime() - offset * 60000);
+        return local.toISOString().split('T')[0];
+      }
+
+      function getCurrentTimeHm() {
+        const now = new Date();
+        return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      }
+
+      // ======================================================================
+      // DAFTAR DINAMIS PERSONEL TERLIBAT (WHO)
+      // ======================================================================
+      window.addPersonnelRow = function(data = {}) {
+        const list = document.getElementById('personnel-list');
+        if (!list) return;
+
+        const idx = list.children.length + 1;
+        const row = document.createElement('div');
+        row.className = 'personnel-row p-3 rounded-xl bg-slate-50 border border-slate-200 relative';
+        row.innerHTML = `
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[11px] font-extrabold uppercase tracking-wider text-blue-900">Personel #${idx}</span>
+            <button type="button" onclick="removePersonnelRow(this)" class="text-xs font-bold text-red-600 hover:text-red-800 px-2 py-0.5 rounded-lg hover:bg-red-50">
+              ✕ Hapus
+            </button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Nama Lengkap</label>
+              <input type="text" class="p-name" placeholder="Nama personel" value="${escapeHtmlAttr(data.name || '')}" />
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Jabatan / Perusahaan</label>
+              <input type="text" class="p-role" placeholder="Mis. Operator DT / SPT" value="${escapeHtmlAttr(data.role || '')}" />
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Peran Keterlibatan</label>
+              <select class="p-involvement">
+                <option value="Operator / Pelaku Aktivitas" ${data.involvement === 'Operator / Pelaku Aktivitas' ? 'selected' : ''}>Operator / Pelaku Aktivitas</option>
+                <option value="Korban Cedera" ${data.involvement === 'Korban Cedera' ? 'selected' : ''}>Korban Cedera</option>
+                <option value="Pengawas / Pimpinan Kerja" ${data.involvement === 'Pengawas / Pimpinan Kerja' ? 'selected' : ''}>Pengawas / Pimpinan Kerja</option>
+                <option value="Pihak Terdampak Lainnya" ${data.involvement === 'Pihak Terdampak Lainnya' ? 'selected' : ''}>Pihak Terdampak Lainnya</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Kondisi Medis Awal</label>
+              <select class="p-medical">
+                <option value="Selamat / Tidak Cedera" ${data.medical === 'Selamat / Tidak Cedera' ? 'selected' : ''}>Selamat / Tidak Cedera</option>
+                <option value="Luka Ringan (P3K)" ${data.medical === 'Luka Ringan (P3K)' ? 'selected' : ''}>Luka Ringan (P3K)</option>
+                <option value="Perawatan Medis (Klinik/RS)" ${data.medical === 'Perawatan Medis (Klinik/RS)' ? 'selected' : ''}>Perawatan Medis (Klinik/RS)</option>
+                <option value="Cedera Berat / Rujukan" ${data.medical === 'Cedera Berat / Rujukan' ? 'selected' : ''}>Cedera Berat / Rujukan</option>
+              </select>
+            </div>
+          </div>
+        `;
+        list.appendChild(row);
+        bindAutoSaveEvents(row);
+        updateCompletionBadges();
+      };
+
+      window.removePersonnelRow = function(btn) {
+        const list = document.getElementById('personnel-list');
+        if (!list) return;
+        const row = btn.closest('.personnel-row');
+        if (row) {
+          if (list.children.length <= 1) {
+            row.querySelectorAll('input').forEach(i => i.value = '');
+          } else {
+            row.remove();
+          }
+          // Re-index labels
+          Array.from(list.children).forEach((el, i) => {
+            const lbl = el.querySelector('span');
+            if (lbl) lbl.textContent = `Personel #${i + 1}`;
+          });
+          saveFormToLocalStorage();
+          updateCompletionBadges();
+        }
+      };
+
+      // ======================================================================
+      // UNGGAH & KOMPRESI FOTO BUKTI (CANVAS)
+      // ======================================================================
+      window.handlePhotoUpload = function(event) {
+        const files = Array.from(event.target.files || []);
+        if (!files.length) return;
+
+        const remaining = 3 - uploadedPhotos.length;
+        if (remaining <= 0) {
+          showToast('Batas Maksimal Foto', 'Maksimal 3 foto bukti lapangan yang dapat dilampirkan.', 'warning');
+          event.target.value = '';
+          return;
+        }
+
+        const toProcess = files.slice(0, remaining);
+        toProcess.forEach(file => {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+              const canvas = document.createElement('canvas');
+              const MAX_DIM = 1024;
+              let w = img.width;
+              let h = img.height;
+              if (w > MAX_DIM || h > MAX_DIM) {
+                if (w > h) {
+                  h = Math.round((h * MAX_DIM) / w);
+                  w = MAX_DIM;
+                } else {
+                  w = Math.round((w * MAX_DIM) / h);
+                  h = MAX_DIM;
+                }
+              }
+              canvas.width = w;
+              canvas.height = h;
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, w, h);
+              const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.72);
+              uploadedPhotos.push({
+                name: file.name || `Foto_Bukti_${uploadedPhotos.length + 1}.jpg`,
+                dataUrl: compressedDataUrl
+              });
+              renderPhotoPreviews();
+              saveFormToLocalStorage();
+            };
+            img.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        });
+        event.target.value = '';
+      };
+
+      window.removePhoto = function(index) {
+        uploadedPhotos.splice(index, 1);
+        renderPhotoPreviews();
+        saveFormToLocalStorage();
+      };
+
+      function renderPhotoPreviews() {
+        const grid = document.getElementById('photo-preview-grid');
+        if (!grid) return;
+        grid.innerHTML = '';
+        uploadedPhotos.forEach((photo, idx) => {
+          const card = document.createElement('div');
+          card.className = 'relative rounded-xl border border-slate-200 overflow-hidden bg-slate-100 shadow-2xs';
+          card.innerHTML = `
+            <img src="${photo.dataUrl}" alt="Foto Bukti ${idx + 1}" class="w-full h-36 object-cover block" />
+            <div class="p-2 bg-white flex items-center justify-between gap-2">
+              <span class="text-[11px] font-semibold text-slate-700 truncate">Foto ${idx + 1}: ${escapeHtml(photo.name)}</span>
+              <button type="button" onclick="removePhoto(${idx})" class="text-xs font-bold text-red-600 hover:text-red-800 px-1.5 py-0.5 rounded bg-red-50">Hapus</button>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+      }
+
+      // ======================================================================
+      // PENGUMPULAN DATA TERSTRUKTUR (5W+1H + METADATA + FOTO)
+      // ======================================================================
+      function collectFormData() {
+        const severityEl = document.querySelector('input[name="what-severity"]:checked');
+        const whyFactors = Array.from(document.querySelectorAll('input[name="why-factor"]:checked')).map(cb => cb.value);
+        const immediateActions = Array.from(document.querySelectorAll('input[name="immediate-action"]:checked')).map(cb => cb.value);
+
+        const personnel = Array.from(document.querySelectorAll('.personnel-row')).map(row => ({
+          name: row.querySelector('.p-name')?.value.trim() || '',
+          role: row.querySelector('.p-role')?.value.trim() || '',
+          involvement: row.querySelector('.p-involvement')?.value || '',
+          medical: row.querySelector('.p-medical')?.value || ''
+        })).filter(p => p.name || p.role);
+
+        return {
+          nomor_referensi: document.getElementById('doc-ref')?.value.trim() || generateRefCode(),
+          tanggal_laporan: document.getElementById('doc-date')?.value || getTodayIso(),
+          status: document.getElementById('doc-status')?.value || 'Terkirim',
+          what: {
+            kategori: document.getElementById('what-category')?.value || '',
+            tingkat_keparahan: severityEl ? severityEl.value : 'Sedang',
+            judul: document.getElementById('what-title')?.value.trim() || '',
+            deskripsi_dampak: document.getElementById('what-desc')?.value.trim() || ''
+          },
+          when: {
+            tanggal: document.getElementById('when-date')?.value || '',
+            jam: document.getElementById('when-time')?.value || '',
+            shift: document.getElementById('when-shift')?.value || ''
+          },
+          where: {
+            area_spesifik: document.getElementById('where-area')?.value.trim() || '',
+            patokan_lingkungan: document.getElementById('where-condition')?.value.trim() || ''
+          },
+          who: {
+            personel_terlibat: personnel,
+            catatan_saksi: document.getElementById('who-witness')?.value.trim() || ''
+          },
+          why: {
+            faktor_penyebab: whyFactors,
+            penjelasan_awal: document.getElementById('why-desc')?.value.trim() || ''
+          },
+          how: {
+            kronologis: document.getElementById('how-chronology')?.value.trim() || ''
+          },
+          tindakan_segera: {
+            daftar_tindakan: immediateActions,
+            catatan_tambahan: document.getElementById('action-notes')?.value.trim() || ''
+          },
+          pengesahan: {
+            pelapor_nama: document.getElementById('sig-reporter-name')?.value.trim() || '',
+            pelapor_jabatan: document.getElementById('sig-reporter-role')?.value.trim() || '',
+            hse_nama: document.getElementById('sig-hse-name')?.value.trim() || '',
+            hse_jabatan: document.getElementById('sig-hse-role')?.value.trim() || 'HSE Officer / Coordinator',
+            ktt_nama: document.getElementById('sig-ktt-name')?.value.trim() || '',
+            ktt_jabatan: document.getElementById('sig-ktt-role')?.value.trim() || 'KTT / PJO / Site Manager'
+          },
+          resume_ai: document.getElementById('ai-resume-output')?.value.trim() || '',
+          foto_base64: uploadedPhotos.map((p, idx) => ({
+            filename: p.name || `Bukti_${idx + 1}.jpg`,
+            dataUrl: p.dataUrl
+          })),
+          folder_target_id: DRIVE_FOLDER_ID,
+          folder_target_name: 'Database Laporan Insiden SPT Group',
+          updated_at: new Date().toISOString()
+        };
+      }
+
+      // ======================================================================
+      // BADGE KELENGKAPAN BAGIAN & AUTO-SAVE LOCALSTORAGE
+      // ======================================================================
+      function updateCompletionBadges() {
+        const d = collectFormData();
+
+        setBadgeState('badge-what', Boolean(d.what.kategori && d.what.judul && d.what.deskripsi_dampak));
+        setBadgeState('badge-when', Boolean(d.when.tanggal && d.when.jam));
+        setBadgeState('badge-where', Boolean(d.where.area_spesifik));
+        setBadgeState('badge-who', d.who.personel_terlibat.length > 0);
+        setBadgeState('badge-why', Boolean(d.why.penjelasan_awal || d.why.faktor_penyebab.length > 0));
+        setBadgeState('badge-how', Boolean(d.how.kronologis));
+
+        const hasAction = d.tindakan_segera.daftar_tindakan.length > 0 || uploadedPhotos.length > 0 || Boolean(d.pengesahan.pelapor_nama);
+        const badgeAct = document.getElementById('badge-action');
+        if (badgeAct) {
+          if (hasAction) {
+            badgeAct.textContent = 'Terisi';
+            badgeAct.className = 'text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800';
+          } else {
+            badgeAct.textContent = 'Opsional';
+            badgeAct.className = 'text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700';
+          }
+        }
+      }
+
+      function setBadgeState(badgeId, isComplete) {
+        const el = document.getElementById(badgeId);
+        if (!el) return;
+        if (isComplete) {
+          el.textContent = 'Lengkap ✓';
+          el.className = 'text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800';
+        } else {
+          el.textContent = 'Belum Lengkap';
+          el.className = 'text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800';
+        }
+      }
+
+      function saveFormToLocalStorage() {
+        try {
+          const data = collectFormData();
+          localStorage.setItem(STORAGE_KEY_DRAFT, JSON.stringify(data));
+          const timeLbl = document.getElementById('autosave-time');
+          if (timeLbl) {
+            timeLbl.textContent = `Tersimpan ${getCurrentTimeHm()}`;
+          }
+          updateCompletionBadges();
+        } catch (err) {
+          // Abaikan jika kuota storage penuh akibat foto besar
+        }
+      }
+
+      function loadFormFromLocalStorage() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY_DRAFT);
+          if (!raw) {
+            document.getElementById('doc-ref').value = generateRefCode();
+            document.getElementById('doc-date').value = getTodayIso();
+            document.getElementById('when-date').value = getTodayIso();
+            document.getElementById('when-time').value = getCurrentTimeHm();
+            addPersonnelRow();
+            updateCompletionBadges();
+            return;
+          }
+          const d = JSON.parse(raw);
+          populateFormWithData(d);
+        } catch (err) {
+          document.getElementById('doc-ref').value = generateRefCode();
+          document.getElementById('doc-date').value = getTodayIso();
+          addPersonnelRow();
+        }
+      }
+
+      function populateFormWithData(d) {
+        document.getElementById('doc-ref').value = d.nomor_referensi || generateRefCode();
+        document.getElementById('doc-date').value = d.tanggal_laporan || getTodayIso();
+        document.getElementById('doc-status').value = d.status || 'Terkirim';
+
+        document.getElementById('what-category').value = d.what?.kategori || '';
+        document.getElementById('what-title').value = d.what?.judul || '';
+        document.getElementById('what-desc').value = d.what?.deskripsi_dampak || '';
+        const sevVal = d.what?.tingkat_keparahan || 'Sedang';
+        const sevRadio = document.querySelector(`input[name="what-severity"][value="${sevVal}"]`);
+        if (sevRadio) sevRadio.checked = true;
+
+        document.getElementById('when-date').value = d.when?.tanggal || getTodayIso();
+        document.getElementById('when-time').value = d.when?.jam || '';
+        document.getElementById('when-shift').value = d.when?.shift || 'Shift 1 (Siang / Day Shift)';
+
+        document.getElementById('where-area').value = d.where?.area_spesifik || '';
+        document.getElementById('where-condition').value = d.where?.patokan_lingkungan || '';
+
+        const list = document.getElementById('personnel-list');
+        if (list) {
+          list.innerHTML = '';
+          const pArr = d.who?.personel_terlibat || [];
+          if (pArr.length > 0) pArr.forEach(p => addPersonnelRow(p));
+          else addPersonnelRow();
+        }
+        document.getElementById('who-witness').value = d.who?.catatan_saksi || '';
+
+        const factors = d.why?.faktor_penyebab || [];
+        document.querySelectorAll('input[name="why-factor"]').forEach(cb => {
+          cb.checked = factors.includes(cb.value);
+        });
+        document.getElementById('why-desc').value = d.why?.penjelasan_awal || '';
+
+        document.getElementById('how-chronology').value = d.how?.kronologis || '';
+
+        const actions = d.tindakan_segera?.daftar_tindakan || [];
+        document.querySelectorAll('input[name="immediate-action"]').forEach(cb => {
+          cb.checked = actions.includes(cb.value);
+        });
+        document.getElementById('action-notes').value = d.tindakan_segera?.catatan_tambahan || '';
+
+        document.getElementById('sig-reporter-name').value = d.pengesahan?.pelapor_nama || '';
+        document.getElementById('sig-reporter-role').value = d.pengesahan?.pelapor_jabatan || '';
+        document.getElementById('sig-hse-name').value = d.pengesahan?.hse_nama || '';
+        document.getElementById('sig-hse-role').value = d.pengesahan?.hse_jabatan || 'HSE Officer / Coordinator';
+        document.getElementById('sig-ktt-name').value = d.pengesahan?.ktt_nama || '';
+        document.getElementById('sig-ktt-role').value = d.pengesahan?.ktt_jabatan || 'KTT / PJO / Site Manager';
+
+        document.getElementById('ai-resume-output').value = d.resume_ai || '';
+
+        uploadedPhotos = Array.isArray(d.foto_base64)
+          ? d.foto_base64.map((f, i) => ({ name: f.filename || `Foto_${i + 1}.jpg`, dataUrl: f.dataUrl }))
+          : [];
+        renderPhotoPreviews();
+        updateCompletionBadges();
+      }
+
+      function bindAutoSaveEvents(rootEl = document) {
+        rootEl.querySelectorAll('input, select, textarea').forEach(el => {
+          if (el.id === 'photo-input' || el.id === 'drive-webapp-url') return;
+          el.addEventListener('input', saveFormToLocalStorage);
+          el.addEventListener('change', saveFormToLocalStorage);
+        });
+      }
+
+      // ======================================================================
+      // CONTOH DATA, SALIN WA & RESET FORMULIR
+      // ======================================================================
+      window.fillSampleData = function() {
+        const sample = {
+          nomor_referensi: generateRefCode(),
+          tanggal_laporan: getTodayIso(),
+          status: 'Terkirim',
+          what: {
+            kategori: 'Property Damage (Kerusakan Aset / Unit)',
+            tingkat_keparahan: 'Sedang',
+            judul: 'Unit Dump Truck DT-14 Tergelincir ke Tanggul Pengaman di Haul Road KM 08',
+            deskripsi_dampak: 'Bumper depan kiri dan step tangga unit DT-14 penyok ringan akibat menyentuh tanggul pengaman (safety berm). Tidak ada korban jiwa maupun cedera personel.'
+          },
+          when: {
+            tanggal: getTodayIso(),
+            jam: '14:15',
+            shift: 'Shift 1 (Siang / Day Shift)'
+          },
+          where: {
+            area_spesifik: 'Haul Road Utama KM 08 — Tikungan Menurun Menuju ROM Stockpile',
+            patokan_lingkungan: '50 meter sebelum Pos Pantau 2, permukaan jalan tanah liat lembab setelah gerimis ringan, jarak pandang baik.'
+          },
+          who: {
+            personel_terlibat: [
+              { name: 'Ahmad Fauzi', role: 'Operator Dump Truck / PT SPT Group', involvement: 'Operator / Pelaku Aktivitas', medical: 'Selamat / Tidak Cedera' },
+              { name: 'Rudi Hartono', role: 'Foreman Hauling / PT SPT Group', involvement: 'Pengawas / Pimpinan Kerja', medical: 'Selamat / Tidak Cedera' }
+            ],
+            catatan_saksi: 'Sdr. Hendra Wijaya (Driver LV-04 di belakang unit dengan jarak aman 60m) menyaksikan bagian belakang unit DT-14 mulai meluncur ke sisi kiri saat pengereman.'
+          },
+          why: {
+            faktor_penyebab: [
+              'Kondisi Jalan / Area Licin atau Rusak',
+              'Kurang Antisipasi / Kecepatan Tidak Sesuai'
+            ],
+            penjelasan_awal: 'Lapisan permukaan jalan hauling masih licin akibat hujan ringan dan kemiringan tikungan menurun menyebabkan traksi ban belakang berkurang saat pengereman.'
+          },
+          how: {
+            kronologis: '1. Pukul 14.05 WITA: Unit DT-14 berangkat dari Pit Utara Blok B membawa muatan menuju ROM Stockpile.\n2. Pukul 14.15 WITA: Memasuki tikungan menurun KM 08, operator mengurangi kecepatan namun roda belakang mengalami selip ke sisi kiri jalan.\n3. Pukul 14.16 WITA: Unit berhenti sempurna setelah tertahan safety berm setinggi 1,5 meter.\n4. Pukul 14.18 WITA: Operator melaporkan kejadian via radio channel HSE dan dilakukan pemasangan safety cone.'
+          },
+          tindakan_segera: {
+            daftar_tindakan: [
+              'Isolasi / Barikade Area Kejadian (Safety Line)',
+              'Penghentian Sementara Aktivitas / Lock Out Tag Out (LOTO)',
+              'Pelaporan Langsung ke Pengawas, HSE & KTT/PJO'
+            ],
+            catatan_tambahan: 'Unit Motor Grader dikerahkan untuk scraping material licin di KM 08 dan unit DT-14 ditarik ke workshop untuk inspeksi mekanis.'
+          },
+          pengesahan: {
+            pelapor_nama: 'Rudi Hartono',
+            pelapor_jabatan: 'Foreman Produksi & Hauling',
+            hse_nama: 'Dedi Kurniawan',
+            hse_jabatan: 'HSE Coordinator Site',
+            ktt_nama: 'Ir. Bambang Sutrisno',
+            ktt_jabatan: 'Kepala Teknik Tambang (KTT)'
+          },
+          resume_ai: '',
+          foto_base64: uploadedPhotos
+        };
+
+        populateFormWithData(sample);
+        saveFormToLocalStorage();
+        showToast('Contoh Data Dimuat', 'Formulir telah diisi dengan simulasi insiden lapangan SPT Group.', 'success');
+      };
+
+      window.copyWhatsAppSummary = function() {
+        const d = collectFormData();
+        const personelTxt = d.who.personel_terlibat.length
+          ? d.who.personel_terlibat.map(p => `- ${p.name} (${p.role}) — ${p.medical}`).join('\n')
+          : '- Tidak ada / Belum diisi';
+
+        const waText = [
+          `*LAPORAN AWAL INSIDEN (5W+1H) — SPT GROUP*`,
+          `No. Ref: *${d.nomor_referensi}*`,
+          `Status: ${d.status}`,
+          ``,
+          `*1. WHAT (Apa):* ${d.what.judul || '-'}`,
+          `• Kategori: ${d.what.kategori || '-'}`,
+          `• Tingkat Keparahan: *${d.what.tingkat_keparahan}*`,
+          `• Dampak: ${d.what.deskripsi_dampak || '-'}`,
+          ``,
+          `*2. WHEN (Kapan):* ${d.when.tanggal || '-'} Pukul ${d.when.jam || '-'} (${d.when.shift})`,
+          `*3. WHERE (Lokasi):* ${d.where.area_spesifik || '-'} (${d.where.patokan_lingkungan || '-'})`,
+          ``,
+          `*4. WHO (Terlibat):*`,
+          personelTxt,
+          ``,
+          `*5. WHY (Dugaan Awal):* ${d.why.penjelasan_awal || '-'}`,
+          `*6. HOW (Kronologis):*`,
+          `${d.how.kronologis || '-'}`,
+          ``,
+          `*Tindakan Segera:* ${d.tindakan_segera.daftar_tindakan.join(', ') || '-'}`,
+          `Pelapor: ${d.pengesahan.pelapor_nama || '-'} | HSE: ${d.pengesahan.hse_nama || '-'}`
+        ].join('\n');
+
+        copyTextWithFallback(waText, 'Ringkasan WhatsApp Disalin', 'Siap ditempel (Paste) ke grup WhatsApp HSE / KTT / PJO.');
+      };
+
+      window.confirmResetForm = function() {
+        // Tanpa confirm() bawaan browser — menggunakan konfirmasi 2-klik aman via Toast/Banner
+        const btn = event?.currentTarget;
+        if (btn && !btn.dataset.armed) {
+          btn.dataset.armed = 'true';
+          const origText = btn.innerHTML;
+          btn.innerHTML = '⚠️ Klik Sekali Lagi untuk Yakin Reset';
+          showToast('Konfirmasi Reset', 'Klik tombol Reset sekali lagi dalam 4 detik untuk mengosongkan seluruh form.', 'warning', 4000);
+          setTimeout(() => {
+            if (btn) {
+              btn.dataset.armed = '';
+              btn.innerHTML = origText;
+            }
+          }, 4000);
+          return;
+        }
+
+        localStorage.removeItem(STORAGE_KEY_DRAFT);
+        uploadedPhotos = [];
+        document.getElementById('incident-form').reset();
+        document.getElementById('doc-ref').value = generateRefCode();
+        document.getElementById('doc-date').value = getTodayIso();
+        document.getElementById('when-date').value = getTodayIso();
+        document.getElementById('when-time').value = getCurrentTimeHm();
+        const list = document.getElementById('personnel-list');
+        if (list) list.innerHTML = '';
+        addPersonnelRow();
+        renderPhotoPreviews();
+        updateCompletionBadges();
+        showToast('Formulir Dikosongkan', 'Nomor referensi baru telah dibuat.', 'info');
+      };
+
+      function copyTextWithFallback(text, successTitle, successMsg) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand('copy');
+          showToast(successTitle, successMsg, 'success');
+        } catch (e) {
+          showToast('Gagal Menyalin', 'Silakan blok teks secara manual lalu salin.', 'error');
+        } finally {
+          document.body.removeChild(ta);
+        }
+      }
+
+      // ======================================================================
+      // RESUME AI (GEMINI API + SMART TEMPLATE OFFLINE CADANGAN)
+      // ======================================================================
+      function buildOfflineSmartTemplate(d) {
+        const whoNames = d.who.personel_terlibat.map(p => `${p.name} (${p.medical})`).join(', ') || 'personel terkait';
+        const actions = d.tindakan_segera.daftar_tindakan.join('; ') || 'pengamanan lokasi awal';
+        return `RINGKASAN EKSEKUTIF INSIDEN (${d.nomor_referensi}): Pada tanggal ${d.when.tanggal || '[Tanggal]'} pukul ${d.when.jam || '[Jam]'} (${d.when.shift}), telah terjadi insiden kategori ${d.what.kategori || '[Kategori]'} dengan tingkat keparahan ${d.what.tingkat_keparahan.toUpperCase()} berupa "${d.what.judul || '[Judul Insiden]'}" di area ${d.where.area_spesifik || '[Lokasi]'}. Kejadian melibatkan ${whoNames} dengan dampak: ${d.what.deskripsi_dampak || 'sedang dalam pendataan'}. Dugaan pemicu awal mengarah pada ${d.why.penjelasan_awal || 'faktor kondisi & operasional lapangan'}. Tim di lapangan telah melakukan tindakan mitigasi segera meliputi ${actions}, dan saat ini area berada dalam pengendalian pengawas serta tim HSE SPT Group.`;
+      }
+
+      window.generateExecutiveResume = async function() {
+        const btn = document.getElementById('btn-generate-ai');
+        const out = document.getElementById('ai-resume-output');
+        const badge = document.getElementById('ai-mode-badge');
+        const d = collectFormData();
+
+        if (!d.what.judul && !d.what.deskripsi_dampak && !d.how.kronologis) {
+          showToast('Data Masih Kosong', 'Isi minimal bagian WHAT atau HOW terlebih dahulu sebelum membuat Resume AI.', 'warning');
+          return;
+        }
+
+        if (btn) {
+          btn.disabled = true;
+          btn.innerHTML = '<span class="animate-spin inline-block">⏳</span> Menyusun Resume AI...';
+        }
+
+        const promptText = `Anda adalah Senior HSE Manager di perusahaan pertambangan/konstruksi PT SPT Group. Buatlah 1 paragraf Resume Eksekutif Laporan Awal Insiden (maksimal 110 kata, bahasa Indonesia formal korporat HSE, padat, objektif, dan siap dibaca KTT/PJO) berdasarkan data 5W+1H berikut:\n${JSON.stringify({
+          ref: d.nomor_referensi,
+          what: d.what,
+          when: d.when,
+          where: d.where,
+          who: d.who,
+          why: d.why,
+          how: d.how,
+          tindakan: d.tindakan_segera
+        })}`;
+
+        const apiKey = "";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+        let aiText = '';
+        let usedGemini = false;
+
+        try {
+          if (!navigator.onLine) throw new Error('Offline');
+
+          const delays = [1000, 2000, 4000];
+          for (let attempt = 0; attempt <= delays.length; attempt++) {
+            try {
+              const resp = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  contents: [{ parts: [{ text: promptText }] }]
+                })
+              });
+              if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+              const json = await resp.json();
+              const candidateText = json?.candidates?.[0]?.content?.parts?.[0]?.text;
+              if (candidateText) {
+                aiText = candidateText.trim();
+                usedGemini = true;
+                break;
+              }
+              throw new Error('Empty response');
+            } catch (err) {
+              if (attempt < delays.length) {
+                await new Promise(r => setTimeout(r, delays[attempt]));
+              } else {
+                throw err;
+              }
+            }
+          }
+        } catch (fallbackErr) {
+          aiText = buildOfflineSmartTemplate(d);
+          usedGemini = false;
+        }
+
+        if (out) out.value = aiText;
+        if (badge) {
+          badge.textContent = usedGemini ? 'Gemini AI ✓' : 'Smart Template Offline ✓';
+          badge.className = usedGemini
+            ? 'text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800'
+            : 'text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800';
+        }
+        saveFormToLocalStorage();
+        showToast(
+          usedGemini ? 'Resume Gemini AI Berhasil' : 'Resume Smart Template Siap',
+          'Ringkasan telah dimasukkan ke kotak dan akan tercetak pada dokumen A4.',
+          'success'
+        );
+
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<span>✨</span> Buat Resume Eksekutif Sekarang';
+        }
+      };
+
+      window.copyAiResume = function() {
+        const val = document.getElementById('ai-resume-output')?.value.trim();
+        if (!val) {
+          showToast('Resume Kosong', 'Buat resume terlebih dahulu sebelum menyalin.', 'warning');
+          return;
+        }
+        copyTextWithFallback(val, 'Resume AI Disalin', 'Teks ringkasan eksekutif berhasil disalin ke clipboard.');
+      };
+
+      // ======================================================================
+      // GENERATOR DOKUMEN CETAK A4 KOMPAK 1 KOLOM MURNI (#print-sheet)
+      // ======================================================================
+      function buildCleanA4Markup(d, forStandaloneExport = false) {
+        const logoSrc = forStandaloneExport ? LOGO_PRIMARY_URL : (document.getElementById('spt-logo-img')?.src || LOGO_PRIMARY_URL);
+
+        const personnelRows = d.who.personel_terlibat.length
+          ? d.who.personel_terlibat.map((p, i) => `
+              <tr>
+                <td style="width:6%; text-align:center;">${i + 1}</td>
+                <td style="width:32%;"><strong>${escapeHtml(p.name || '-')}</strong></td>
+                <td style="width:24%;">${escapeHtml(p.role || '-')}</td>
+                <td style="width:20%;">${escapeHtml(p.involvement || '-')}</td>
+                <td style="width:18%;">${escapeHtml(p.medical || '-')}</td>
+              </tr>
+            `).join('')
+          : `<tr><td colspan="5" style="color:#64748B; font-style:italic;">Tidak ada personel terdampak / data belum dicantumkan.</td></tr>`;
+
+        const whyListHtml = d.why.faktor_penyebab.length
+          ? `<div style="margin-bottom:3px;"><strong>Faktor Teridentifikasi:</strong> ${d.why.faktor_penyebab.map(f => `☑ ${escapeHtml(f)}`).join(' &nbsp;|&nbsp; ')}</div>`
+          : '';
+
+        const actionListHtml = d.tindakan_segera.daftar_tindakan.length
+          ? `<div style="margin-bottom:3px;">${d.tindakan_segera.daftar_tindakan.map(a => `☑ ${escapeHtml(a)}`).join(' &nbsp;|&nbsp; ')}</div>`
+          : '<div style="color:#64748B;">Belum ada checklist tindakan segera dipilih.</div>';
+
+        const photosHtml = d.foto_base64 && d.foto_base64.length > 0
+          ? `
+            <div class="print-section-title">LAMPIRAN DOKUMENTASI FOTO BUKTI LAPANGAN</div>
+            <div class="print-photo-grid">
+              ${d.foto_base64.map((ph, idx) => `
+                <div class="print-photo-item">
+                  <img src="${ph.dataUrl}" alt="Bukti ${idx + 1}" />
+                  <div style="font-size:8pt; margin-top:2px; color:#334155;">Foto ${idx + 1}: ${escapeHtml(ph.filename || 'Bukti Lapangan')}</div>
+                </div>
+              `).join('')}
+            </div>
+          `
+          : '';
+
+        const resumeAiHtml = d.resume_ai
+          ? `
+            <div class="print-section-title">RESUME EKSEKUTIF (RINGKASAN MANAJEMEN &amp; KTT)</div>
+            <div class="print-narrative" style="background:#F8FAFC; border:1px solid #CBD5E1; padding:5px 7px;">${escapeHtml(d.resume_ai)}</div>
+          `
+          : '';
+
+        return `
+          <div class="print-header">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <img src="${logoSrc}" alt="SPT Group" style="width:42px; height:42px; object-fit:contain;" onerror="this.style.display='none'" />
+              <div>
+                <div style="font-size:12pt; font-weight:800; color:#0F294A; letter-spacing:0.02em;">PT SPT GROUP — HSE DIVISION</div>
+                <div style="font-size:10.5pt; font-weight:700; color:#1E293B;">FORMULIR LAPORAN AWAL INSIDEN (INITIAL INCIDENT REPORT 5W+1H)</div>
+              </div>
+            </div>
+            <div style="text-align:right; font-size:8.5pt;">
+              <div><strong>No. Dokumen:</strong> ${escapeHtml(d.nomor_referensi)}</div>
+              <div><strong>Tgl. Laporan:</strong> ${escapeHtml(d.tanggal_laporan)}</div>
+              <div><strong>Status:</strong> ${escapeHtml(d.status)}</div>
+            </div>
+          </div>
+
+          <div class="print-section-title">1. WHAT — IDENTIFIKASI &amp; DESKRIPSI KEJADIAN</div>
+          <table class="print-table">
+            <tr>
+              <td class="print-label">Judul Kejadian</td>
+              <td colspan="3"><strong>${escapeHtml(d.what.judul || '-')}</strong></td>
+            </tr>
+            <tr>
+              <td class="print-label">Kategori Insiden</td>
+              <td style="width:31%;">${escapeHtml(d.what.kategori || '-')}</td>
+              <td class="print-label" style="width:20%;">Tingkat Keparahan</td>
+              <td style="width:25%;"><strong>${escapeHtml(d.what.tingkat_keparahan)}</strong></td>
+            </tr>
+            <tr>
+              <td class="print-label">Deskripsi &amp; Dampak</td>
+              <td colspan="3">${escapeHtml(d.what.deskripsi_dampak || '-')}</td>
+            </tr>
+          </table>
+
+          <div class="print-section-title">2. WHEN &amp; 3. WHERE — WAKTU &amp; LOKASI KEJADIAN</div>
+          <table class="print-table">
+            <tr>
+              <td class="print-label">Tanggal &amp; Jam</td>
+              <td style="width:31%;">${escapeHtml(d.when.tanggal || '-')} &bull; Pukul ${escapeHtml(d.when.jam || '-')}</td>
+              <td class="print-label" style="width:20%;">Shift Kerja</td>
+              <td style="width:25%;">${escapeHtml(d.when.shift || '-')}</td>
+            </tr>
+            <tr>
+              <td class="print-label">Area Kerja Spesifik</td>
+              <td colspan="3">${escapeHtml(d.where.area_spesifik || '-')}</td>
+            </tr>
+            <tr>
+              <td class="print-label">Patokan &amp; Lingkungan</td>
+              <td colspan="3">${escapeHtml(d.where.patokan_lingkungan || '-')}</td>
+            </tr>
+          </table>
+
+          <div class="print-section-title">4. WHO — PERSONEL TERLIBAT &amp; SAKSI MATA</div>
+          <table class="print-table">
+            <thead>
+              <tr>
+                <th style="width:6%; text-align:center;">No</th>
+                <th style="width:32%;">Nama Personel</th>
+                <th style="width:24%;">Jabatan / Perusahaan</th>
+                <th style="width:20%;">Peran Keterlibatan</th>
+                <th style="width:18%;">Kondisi Medis</th>
+              </tr>
+            </thead>
+            <tbody>${personnelRows}</tbody>
+          </table>
+          ${d.who.catatan_saksi ? `<div class="print-narrative"><strong>Catatan Saksi Mata:</strong> ${escapeHtml(d.who.catatan_saksi)}</div>` : ''}
+
+          <div class="print-section-title">5. WHY — DUGAAN PENYEBAB AWAL</div>
+          <div class="print-narrative">
+            ${whyListHtml}
+            <div><strong>Penjelasan Dugaan Awal:</strong> ${escapeHtml(d.why.penjelasan_awal || '-')}</div>
+          </div>
+
+          <div class="print-section-title">6. HOW — URAIAN KRONOLOGIS KEJADIAN</div>
+          <div class="print-narrative">${escapeHtml(d.how.kronologis || '-')}</div>
+
+          <div class="print-section-title">7. TINDAKAN SEGERA / MITIGASI AWAL</div>
+          <div class="print-narrative">
+            ${actionListHtml}
+            ${d.tindakan_segera.catatan_tambahan ? `<div><strong>Catatan Tindakan:</strong> ${escapeHtml(d.tindakan_segera.catatan_tambahan)}</div>` : ''}
+          </div>
+
+          ${resumeAiHtml}
+          ${photosHtml}
+
+          <table class="print-signatures">
+            <tr>
+              <td>
+                <div style="font-size:8.5pt; color:#475569;">Dilaporkan Oleh,</div>
+                <div class="sig-space"></div>
+                <div style="font-weight:700; text-decoration:underline;">${escapeHtml(d.pengesahan.pelapor_nama || '( .............................. )')}</div>
+                <div style="font-size:8pt; color:#334155;">${escapeHtml(d.pengesahan.pelapor_jabatan || 'Pelapor / Pengawas Lapangan')}</div>
+              </td>
+              <td>
+                <div style="font-size:8.5pt; color:#475569;">Diverifikasi Oleh,</div>
+                <div class="sig-space"></div>
+                <div style="font-weight:700; text-decoration:underline;">${escapeHtml(d.pengesahan.hse_nama || '( .............................. )')}</div>
+                <div style="font-size:8pt; color:#334155;">${escapeHtml(d.pengesahan.hse_jabatan || 'HSE Officer / Coordinator')}</div>
+              </td>
+              <td>
+                <div style="font-size:8.5pt; color:#475569;">Diketahui / Disetujui Oleh,</div>
+                <div class="sig-space"></div>
+                <div style="font-weight:700; text-decoration:underline;">${escapeHtml(d.pengesahan.ktt_nama || '( .............................. )')}</div>
+                <div style="font-size:8pt; color:#334155;">${escapeHtml(d.pengesahan.ktt_jabatan || 'KTT / PJO / Site Manager')}</div>
+              </td>
+            </tr>
+          </table>
+          <div style="margin-top:5px; font-size:7.5pt; color:#64748B; display:flex; justify-content:space-between;">
+            <span>Dokumen Resmi HSE PT SPT Group • Database Folder ID: ${DRIVE_FOLDER_ID}</span>
+            <span>Dicetak / Diarsipkan: ${new Date().toLocaleString('id-ID')}</span>
+          </div>
+        `;
+      }
+
+      window.prepareAndPrint = function() {
+        const d = collectFormData();
+        const printSheet = document.getElementById('print-sheet');
+        if (printSheet) {
+          printSheet.innerHTML = buildCleanA4Markup(d, false);
+        }
+        setTimeout(() => {
+          window.print();
+        }, 120);
+      };
+
+      // ======================================================================
+      // FITUR BARU: UPLOAD KE DATABASE GOOGLE DRIVE (SPT GROUP)
+      // Folder: "Database Laporan Insiden SPT Group" (1jNQtGEM8GGwvFXaM7k_1M5QySWlzy08E)
+      // ======================================================================
+      function getSavedWebAppUrl() {
+        return (localStorage.getItem(STORAGE_KEY_DRIVE_URL) || '').trim();
+      }
+
+      function updateDriveStatusUI() {
+        const url = getSavedWebAppUrl();
+        const pill = document.getElementById('header-drive-pill');
+        const statusBadge = document.getElementById('drive-conn-status');
+        const urlInput = document.getElementById('drive-webapp-url');
+
+        if (urlInput && url && !urlInput.value) {
+          urlInput.value = url;
+        }
+
+        if (url) {
+          if (pill) {
+            pill.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Cloud Drive Terhubung';
+          }
+          if (statusBadge) {
+            statusBadge.textContent = '✅ Terhubung ke Web App Drive';
+            statusBadge.className = 'text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800';
+          }
+        } else {
+          if (pill) {
+            pill.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-300"></span> DB Drive (Mode Arsip)';
+          }
+          if (statusBadge) {
+            statusBadge.textContent = '📁 Mode Arsip & Buka Folder';
+            statusBadge.className = 'text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800';
+          }
+        }
+
+        renderOfflineQueueUI();
+      }
+
+      window.openDriveModal = function() {
+        updateDriveStatusUI();
+        const modal = document.getElementById('drive-modal');
+        if (modal) modal.classList.remove('hidden');
+      };
+
+      window.closeDriveModal = function() {
+        const modal = document.getElementById('drive-modal');
+        if (modal) modal.classList.add('hidden');
+      };
+
+      // Tombol utama "Upload ke Drive" di toolbar/floating bar
+      window.triggerDriveUploadAction = function() {
+        openDriveModal();
+        const url = getSavedWebAppUrl();
+        if (url && navigator.onLine) {
+          // Jika Web App URL sudah dikonfigurasi dan online, langsung eksekusi upload otomatis
+          uploadToGoogleDriveCloud();
+        }
+      };
+
+      window.saveWebAppUrl = function() {
+        const input = document.getElementById('drive-webapp-url');
+        const val = (input?.value || '').trim();
+        if (val && !val.startsWith('https://script.google.com/')) {
+          showToast('Format URL Kurang Tepat', 'URL Web App Google Apps Script harus diawali https://script.google.com/...', 'warning');
+          return;
+        }
+        localStorage.setItem(STORAGE_KEY_DRIVE_URL, val);
+        updateDriveStatusUI();
+        showToast(
+          val ? 'Koneksi Drive Tersimpan' : 'URL Dihapus',
+          val ? 'Aplikasi siap mengirim laporan 1-klik ke folder Database Laporan Insiden SPT Group.' : 'Beralih ke mode ekspor arsip manual.',
+          'success'
+        );
+      };
+
+      // Kode Google Apps Script siap tempel (1-Klik Salin)
+      const APPS_SCRIPT_SERVER_CODE = `// ============================================================================
+// GOOGLE APPS SCRIPT BACKEND — DATABASE LAPORAN INSIDEN SPT GROUP
+// Folder Tujuan: "Database Laporan Insiden SPT Group"
+// Folder ID    : 1jNQtGEM8GGwvFXaM7k_1M5QySWlzy08E
+// ============================================================================
+const FOLDER_ID = '1jNQtGEM8GGwvFXaM7k_1M5QySWlzy08E';
+const SHEET_NAME = 'Log_Database_Insiden_SPT_Group';
+
+function doPost(e) {
+  try {
+    const raw = e.postData && e.postData.contents ? e.postData.contents : '{}';
+    const data = JSON.parse(raw);
+    const folder = DriveApp.getFolderById(FOLDER_ID);
+
+    const noRef = data.nomor_referensi || ('SPT-INC-' + new Date().getTime());
+    const tgl = data.tanggal_laporan || Utilities.formatDate(new Date(), 'Asia/Makassar', 'yyyy-MM-dd');
+    const safeTitle = (data.what && data.what.judul ? data.what.judul : 'Laporan_Insiden')
+      .replace(/[^a-zA-Z0-9_-]/g, '_')
+      .substring(0, 40);
+    const baseFileName = noRef + '_' + safeTitle + '_' + tgl;
+
+    // 1. Simpan Dokumen Laporan A4 Mandiri (.html) ke Folder Drive
+    let savedDocUrl = '';
+    if (data.archive_html) {
+      const htmlBlob = Utilities.newBlob(data.archive_html, 'text/html', baseFileName + '.html');
+      const docFile = folder.createFile(htmlBlob);
+      savedDocUrl = docFile.getUrl();
+    }
+
+    // 2. Simpan Foto Bukti Lapangan (jika ada)
+    const photoUrls = [];
+    if (Array.isArray(data.foto_base64)) {
+      data.foto_base64.forEach(function(item, idx) {
+        if (item && item.dataUrl && item.dataUrl.indexOf('base64,') > -1) {
+          const base64Part = item.dataUrl.split('base64,')[1];
+          const decoded = Utilities.base64Decode(base64Part);
+          const photoName = baseFileName + '_Foto_' + (idx + 1) + '.jpg';
+          const photoBlob = Utilities.newBlob(decoded, 'image/jpeg', photoName);
+          const photoFile = folder.createFile(photoBlob);
+          photoUrls.push(photoFile.getUrl());
+        }
+      });
+    }
+
+    // 3. Catat ke Google Sheets Log Database di dalam Folder yang sama
+    let ss;
+    const existingSheets = folder.getFilesByName(SHEET_NAME);
+    if (existingSheets.hasNext()) {
+      ss = SpreadsheetApp.open(existingSheets.next());
+    } else {
+      ss = SpreadsheetApp.create(SHEET_NAME);
+      const ssFile = DriveApp.getFileById(ss.getId());
+      folder.addFile(ssFile);
+      DriveApp.getRootFolder().removeFile(ssFile);
+      const sheet = ss.getSheets()[0];
+      sheet.appendRow([
+        'Timestamp Upload', 'Nomor Referensi', 'Tanggal Laporan', 'Status',
+        'Kategori Insiden', 'Tingkat Keparahan', 'Judul Kejadian',
+        'Tanggal Kejadian', 'Jam', 'Shift', 'Lokasi / Area',
+        'Personel Terlibat', 'Dugaan Penyebab Awal', 'Kronologis',
+        'Tindakan Segera', 'Resume Eksekutif AI', 'Pelapor', 'HSE Verifikator',
+        'KTT / PJO', 'Link Dokumen A4 Drive', 'Link Foto Bukti'
+      ]);
+      sheet.getRange(1, 1, 1, 21).setFontWeight('bold').setBackground('#0F294A').setFontColor('#FFFFFF');
+    }
+
+    const logSheet = ss.getSheets()[0];
+    const personelSummary = (data.who && Array.isArray(data.who.personel_terlibat))
+      ? data.who.personel_terlibat.map(function(p) { return p.name + ' (' + p.medical + ')'; }).join('; ')
+      : '-';
+
+    logSheet.appendRow([
+      new Date(),
+      noRef,
+      tgl,
+      data.status || 'Terkirim',
+      (data.what && data.what.kategori) || '',
+      (data.what && data.what.tingkat_keparahan) || '',
+      (data.what && data.what.judul) || '',
+      (data.when && data.when.tanggal) || '',
+      (data.when && data.when.jam) || '',
+      (data.when && data.when.shift) || '',
+      (data.where && data.where.area_spesifik) || '',
+      personelSummary,
+      (data.why && data.why.penjelasan_awal) || '',
+      (data.how && data.how.kronologis) || '',
+      (data.tindakan_segera && Array.isArray(data.tindakan_segera.daftar_tindakan)) ? data.tindakan_segera.daftar_tindakan.join(', ') : '',
+      data.resume_ai || '',
+      (data.pengesahan && data.pengesahan.pelapor_nama) || '',
+      (data.pengesahan && data.pengesahan.hse_nama) || '',
+      (data.pengesahan && data.pengesahan.ktt_nama) || '',
+      savedDocUrl,
+      photoUrls.join(' | ')
+    ]);
+
+    return ContentService
+      .createTextOutput(JSON.stringify({
+        status: 'success',
+        nomor_referensi: noRef,
+        folder_url: 'https://drive.google.com/drive/folders/' + FOLDER_ID,
+        file_url: savedDocUrl
+      }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ status: 'error', message: err.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}`;
+
+      window.copyAppsScriptCode = function() {
+        copyTextWithFallback(
+          APPS_SCRIPT_SERVER_CODE,
+          'Kode Apps Script Disalin!',
+          'Tempel kode di script.google.com lalu Deploy sebagai Web App (Anyone).'
+        );
+      };
+
+      // Membuat HTML mandiri siap cetak A4 untuk diarsipkan ke Google Drive
+      function buildStandaloneArchiveHtml(d) {
+        const innerA4 = buildCleanA4Markup(d, true);
+        return `<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>${escapeHtml(d.nomor_referensi)} - Laporan Awal Insiden SPT Group</title>
+  <style>
+    @page { size: A4 portrait; margin: 11mm 12mm; }
+    body { font-family: Arial, Helvetica, sans-serif; font-size: 9.5pt; line-height: 1.35; color: #0F172A; max-width: 210mm; margin: 12px auto; padding: 14px; background: #fff; }
+    .print-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #0F294A; padding-bottom: 6px; margin-bottom: 8px; }
+    .print-section-title { background: #0F294A; color: #fff; font-weight: 700; font-size: 8.8pt; padding: 3px 8px; margin-top: 8px; margin-bottom: 4px; text-transform: uppercase; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .print-table { width: 100%; border-collapse: collapse; margin-bottom: 4px; }
+    .print-table td, .print-table th { border: 1px solid #CBD5E1; padding: 4px 6px; vertical-align: top; text-align: left; font-size: 9pt; }
+    .print-table th { background: #F1F5F9; font-weight: 600; }
+    .print-label { width: 24%; font-weight: 600; color: #334155; background: #F8FAFC; }
+    .print-narrative { padding: 4px 2px; white-space: pre-wrap; font-size: 9pt; }
+    .print-photo-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+    .print-photo-item { width: 31.5%; border: 1px solid #CBD5E1; padding: 3px; text-align: center; }
+    .print-photo-item img { width: 100%; height: 115px; object-fit: cover; display: block; }
+    .print-signatures { margin-top: 14px; width: 100%; border-collapse: collapse; }
+    .print-signatures td { width: 33.33%; border: 1px solid #CBD5E1; padding: 6px 8px; text-align: center; vertical-align: top; }
+    .sig-space { height: 44px; }
+    @media print { body { margin: 0; padding: 0; } .no-print { display: none !important; } }
+  </style>
+</head>
+<body>
+  <div class="no-print" style="background:#EFF6FF; border:1px solid #BFDBFE; padding:8px 12px; border-radius:8px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+    <span style="font-size:12px; color:#1E3A8A;"><strong>Arsip Resmi Database Google Drive SPT Group</strong> • ${escapeHtml(d.nomor_referensi)}</span>
+    <button onclick="window.print()" style="background:#0F294A; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;">🖨️ Cetak PDF / A4</button>
+  </div>
+  ${innerA4}
+</body>
+</html>`;
+      }
+
+      // Eksekusi Upload Otomatis ke Google Apps Script Web App
+      window.uploadToGoogleDriveCloud = async function() {
+        const webAppUrl = getSavedWebAppUrl();
+        const feedbackEl = document.getElementById('drive-upload-feedback');
+        const btn = document.getElementById('btn-execute-cloud-upload');
+
+        if (!webAppUrl) {
+          const details = document.getElementById('apps-script-config-details');
+          if (details) details.open = true;
+          if (feedbackEl) {
+            feedbackEl.className = 'p-3 rounded-xl text-xs bg-amber-50 border border-amber-300 text-amber-900';
+            feedbackEl.innerHTML = '<strong>URL Web App Belum Dipasang:</strong> Silakan tempel URL Web App Apps Script di pengaturan bawah, atau gunakan tombol <em>"Unduh Arsip A4 (.html) &amp; Buka Drive"</em> di Metode 2 untuk langsung mengunggah ke folder Drive.';
+            feedbackEl.classList.remove('hidden');
+          }
+          showToast('URL Web App Belum Diisi', 'Gunakan Metode 2 di bawah untuk unduh & buka folder Drive, atau pasang URL Web App.', 'warning');
+          return;
+        }
+
+        if (!navigator.onLine) {
+          queueReportForOfflineSync();
+          return;
+        }
+
+        const payload = collectFormData();
+        payload.archive_html = buildStandaloneArchiveHtml(payload);
+
+        if (btn) {
+          btn.disabled = true;
+          btn.innerHTML = '<span class="animate-spin inline-block">⏳</span> Mengunggah ke Database Drive...';
+        }
+
+        try {
+          // Menggunakan text/plain agar terhindar dari CORS preflight OPTIONS pada Google Apps Script Web App
+          const response = await fetch(webAppUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(payload)
+          });
+
+          let resultData = null;
+          try {
+            resultData = await response.json();
+          } catch (_) {
+            // Jika mode opaque/redirect berhasil
+            resultData = { status: 'success' };
+          }
+
+          if (resultData && resultData.status === 'error') {
+            throw new Error(resultData.message || 'Gagal memproses di server Apps Script');
+          }
+
+          if (feedbackEl) {
+            feedbackEl.className = 'p-3.5 rounded-xl text-xs bg-emerald-50 border border-emerald-300 text-emerald-950 space-y-2';
+            feedbackEl.innerHTML = `
+              <div class="font-bold text-emerald-900">✅ Berhasil Diunggah ke Database Google Drive SPT Group!</div>
+              <div>Laporan <strong>${escapeHtml(payload.nomor_referensi)}</strong> beserta lampiran telah tersimpan di folder <em>Database Laporan Insiden SPT Group</em>.</div>
+              <div>
+                <a href="${DRIVE_FOLDER_URL}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-bold">
+                  📂 Buka Folder Google Drive Sekarang ↗
+                </a>
+              </div>
+            `;
+            feedbackEl.classList.remove('hidden');
+          }
+
+          showToast(
+            'Upload ke Google Drive Berhasil!',
+            `Dokumen ${payload.nomor_referensi} tersimpan di Database Laporan Insiden SPT Group.`,
+            'success',
+            6000
+          );
+        } catch (err) {
+          if (feedbackEl) {
+            feedbackEl.className = 'p-3 rounded-xl text-xs bg-red-50 border border-red-300 text-red-900';
+            feedbackEl.innerHTML = `<strong>Gagal Terhubung ke Server Drive:</strong> ${escapeHtml(err.message)}. Anda dapat menyimpan laporan ke <em>Antrean Offline</em> atau mengunduh arsip melalui Metode 2.`;
+            feedbackEl.classList.remove('hidden');
+          }
+          showToast('Upload Gagal', 'Periksa koneksi atau URL Web App, atau gunakan Metode 2 (Unduh & Buka Drive).', 'error');
+        } finally {
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<span>☁️</span> Upload Laporan Sekarang ke Google Drive';
+          }
+        }
+      };
+
+      // Metode 2: Unduh File Arsip Mandiri & Buka Langsung Folder Google Drive
+      window.downloadArchiveHtmlAndOpenDrive = function() {
+        const d = collectFormData();
+        const htmlContent = buildStandaloneArchiveHtml(d);
+        const safeRef = (d.nomor_referensi || 'SPT-INC').replace(/[^a-zA-Z0-9_-]/g, '_');
+        const safeDate = (d.tanggal_laporan || getTodayIso()).replace(/[^0-9-]/g, '');
+        const fileName = `${safeRef}_Laporan_Insiden_SPT_${safeDate}.html`;
+
+        const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 2000);
+
+        window.open(DRIVE_FOLDER_URL, '_blank', 'noopener,noreferrer');
+        showToast(
+          'Arsip Diunduh & Folder Drive Dibuka',
+          `Unggah file "${fileName}" ke folder Database Laporan Insiden SPT Group yang baru dibuka.`,
+          'success',
+          6500
+        );
+      };
+
+      // Unduh Rekap CSV untuk Database Spreadsheet
+      window.downloadDatabaseCsv = function() {
+        const d = collectFormData();
+        const headers = [
+          'Nomor Referensi', 'Tanggal Laporan', 'Status', 'Kategori Insiden',
+          'Tingkat Keparahan', 'Judul Kejadian', 'Deskripsi Dampak',
+          'Tanggal Kejadian', 'Jam', 'Shift', 'Area Spesifik', 'Patokan Lingkungan',
+          'Personel Terlibat', 'Saksi Mata', 'Faktor Penyebab', 'Penjelasan Dugaan Awal',
+          'Kronologis', 'Tindakan Segera', 'Resume AI', 'Pelapor', 'HSE Verifikator', 'KTT/PJO'
+        ];
+
+        const personelStr = d.who.personel_terlibat.map(p => `${p.name} (${p.role} - ${p.medical})`).join('; ');
+        const row = [
+          d.nomor_referensi, d.tanggal_laporan, d.status, d.what.kategori,
+          d.what.tingkat_keparahan, d.what.judul, d.what.deskripsi_dampak,
+          d.when.tanggal, d.when.jam, d.when.shift, d.where.area_spesifik, d.where.patokan_lingkungan,
+          personelStr, d.who.catatan_saksi, d.why.faktor_penyebab.join('; '), d.why.penjelasan_awal,
+          d.how.kronologis, d.tindakan_segera.daftar_tindakan.join('; '), d.resume_ai,
+          d.pengesahan.pelapor_nama, d.pengesahan.hse_nama, d.pengesahan.ktt_nama
+        ].map(val => `"${String(val || '').replace(/"/g, '""')}"`);
+
+        const csvContent = '\uFEFF' + headers.join(',') + '\n' + row.join(',');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${d.nomor_referensi}_Database_SPT_${d.tanggal_laporan}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 2000);
+
+        showToast('File CSV Database Diunduh', 'Siap diimpor atau diunggah ke folder Database Google Drive.', 'success');
+      };
+
+      // ======================================================================
+      // SISTEM ANTREAN OFFLINE & SYNC NANTI
+      // ======================================================================
+      function getOfflineQueue() {
+        try {
+          return JSON.parse(localStorage.getItem(STORAGE_KEY_DRIVE_QUEUE) || '[]');
+        } catch (_) {
+          return [];
+        }
+      }
+
+      function saveOfflineQueue(arr) {
+        try {
+          localStorage.setItem(STORAGE_KEY_DRIVE_QUEUE, JSON.stringify(arr));
+        } catch (_) {}
+        renderOfflineQueueUI();
+      }
+
+      window.queueReportForOfflineSync = function() {
+        const d = collectFormData();
+        d.archive_html = buildStandaloneArchiveHtml(d);
+        d.queued_at = new Date().toLocaleString('id-ID');
+
+        const queue = getOfflineQueue();
+        const existingIdx = queue.findIndex(item => item.nomor_referensi === d.nomor_referensi);
+        if (existingIdx > -1) queue[existingIdx] = d;
+        else queue.push(d);
+
+        saveOfflineQueue(queue);
+        showToast(
+          'Disimpan ke Antrean Offline',
+          `Laporan ${d.nomor_referensi} masuk antrean lokal (${queue.length} tertunda).`,
+          'warning'
+        );
+      };
+
+      window.removeQueuedItem = function(idx) {
+        const queue = getOfflineQueue();
+        queue.splice(idx, 1);
+        saveOfflineQueue(queue);
+      };
+
+      window.syncAllQueuedReports = async function() {
+        const webAppUrl = getSavedWebAppUrl();
+        if (!webAppUrl) {
+          const details = document.getElementById('apps-script-config-details');
+          if (details) details.open = true;
+          showToast('URL Web App Diperlukan', 'Pasang URL Web App Google Apps Script terlebih dahulu untuk melakukan Auto-Sync.', 'warning');
+          return;
+        }
+        if (!navigator.onLine) {
+          showToast('Perangkat Masih Offline', 'Pastikan koneksi internet aktif sebelum menekan Sync Semua.', 'error');
+          return;
+        }
+
+        const queue = getOfflineQueue();
+        if (!queue.length) return;
+
+        let successCount = 0;
+        const remaining = [];
+
+        for (const item of queue) {
+          try {
+            const resp = await fetch(webAppUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+              body: JSON.stringify(item)
+            });
+            if (!resp.ok) throw new Error('HTTP Error');
+            successCount++;
+          } catch (_) {
+            remaining.push(item);
+          }
+        }
+
+        saveOfflineQueue(remaining);
+        if (successCount > 0) {
+          showToast('Sinkronisasi Selesai', `${successCount} laporan berhasil diunggah ke Google Drive.`, 'success');
+        } else {
+          showToast('Sinkronisasi Tertunda', 'Gagal terhubung ke server Apps Script. Data tetap aman di antrean.', 'error');
+        }
+      };
+
+      function renderOfflineQueueUI() {
+        const queue = getOfflineQueue();
+        const count = queue.length;
+
+        const deskBadge = document.getElementById('desktop-queue-badge');
+        const mobBadge = document.getElementById('mobile-queue-badge');
+        const box = document.getElementById('offline-queue-box');
+        const countLbl = document.getElementById('queue-count-label');
+        const listEl = document.getElementById('offline-queue-list');
+
+        [deskBadge, mobBadge].forEach(b => {
+          if (!b) return;
+          if (count > 0) {
+            b.textContent = count;
+            b.classList.remove('hidden');
+          } else {
+            b.classList.add('hidden');
+          }
+        });
+
+        if (!box || !listEl) return;
+        if (count === 0) {
+          box.classList.add('hidden');
+          return;
+        }
+
+        box.classList.remove('hidden');
+        if (countLbl) countLbl.textContent = count;
+        listEl.innerHTML = queue.map((item, idx) => `
+          <div class="flex items-center justify-between gap-2 bg-white px-3 py-2 rounded-xl border border-amber-200 text-xs">
+            <div class="min-w-0">
+              <div class="font-bold text-slate-900 truncate">${escapeHtml(item.nomor_referensi)} — ${escapeHtml(item.what?.judul || 'Tanpa Judul')}</div>
+              <div class="text-[10px] text-slate-500">Disimpan: ${escapeHtml(item.queued_at || '-')}</div>
+            </div>
+            <button type="button" onclick="removeQueuedItem(${idx})" class="text-red-600 hover:text-red-800 font-bold px-2 py-1">Hapus</button>
+          </div>
+        `).join('');
+      }
+
+      // ======================================================================
+      // HELPER ESCAPE HTML
+      // ======================================================================
+      function escapeHtml(str) {
+        return String(str || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      function escapeHtmlAttr(str) {
+        return escapeHtml(str).replace(/\n/g, ' ');
+      }
+
+      // ======================================================================
+      // INISIALISASI SAAT HALAMAN DIMUAT
+      // ======================================================================
+      loadFormFromLocalStorage();
+      bindAutoSaveEvents(document);
+      updateDriveStatusUI();
+
+      // Pantau status koneksi online/offline untuk pengingat sync
+      window.addEventListener('online', () => {
+        const q = getOfflineQueue();
+        if (q.length > 0) {
+          showToast('Koneksi Internet Kembali Aktif', `Terdapat ${q.length} laporan di antrean offline yang siap di-upload ke Google Drive.`, 'info', 6000);
+        }
+      });
+
+    } catch (initError) {
+      console.error('Terjadi kesalahan inisialisasi formulir SPT Group:', initError);
+    }
+  </script>
+</body>
+</html>
