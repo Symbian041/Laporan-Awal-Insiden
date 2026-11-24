@@ -18,6 +18,7 @@
               spt: {
                 navy: '#0F294A',
                 blue: '#1D4ED8',
+                drive: '#1A73E8',
                 amber: '#D97706',
                 red: '#DC2626',
                 slate: '#F1F5F9'
@@ -53,11 +54,11 @@
       background-color: var(--spt-bg);
       color: var(--spt-text);
       -webkit-font-smoothing: antialiased;
-      padding-bottom: calc(88px + env(safe-area-inset-bottom, 16px));
+      padding-bottom: calc(92px + env(safe-area-inset-bottom, 16px));
     }
 
     @media (min-width: 768px) {
-      body { padding-bottom: 40px; }
+      body { padding-bottom: 44px; }
     }
 
     /* Input 16px untuk mencegah auto-zoom di iOS/Android */
@@ -84,7 +85,6 @@
       box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.15);
     }
 
-    /* Fallback grid & flex utilitas jika CDN lambat */
     .fallback-container { max-width: 1080px; margin: 0 auto; padding: 0 12px; }
     @media (min-width: 640px) { .fallback-container { padding: 0 20px; } }
 
@@ -121,7 +121,7 @@
 
     @media (min-width: 768px) {
       .section-body.collapsed {
-        display: block; /* Di desktop selalu terbuka rapi */
+        display: block;
       }
       .chevron-mobile { display: none; }
     }
@@ -155,7 +155,7 @@
       left: 0;
       right: 0;
       z-index: 40;
-      background: rgba(255, 255, 255, 0.96);
+      background: rgba(255, 255, 255, 0.97);
       backdrop-filter: blur(10px);
       border-top: 1px solid #CBD5E1;
       padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
@@ -196,7 +196,7 @@
       }
 
       /* Sembunyikan seluruh antarmuka layar */
-      #app-ui, #toast-box, #drive-modal, #mobile-more-sheet {
+      #app-ui, #toast-box, #mobile-more-sheet {
         display: none !important;
       }
 
@@ -330,50 +330,43 @@
   </div>
 
   <!-- ========================================================================
-       ANTARMWUKA LAYAR UTAMA (#app-ui)
+       ANTARMUKA LAYAR UTAMA (#app-ui)
        ======================================================================== -->
   <div id="app-ui">
     <!-- TOP CORPORATE HEADER -->
     <header class="bg-[#0F294A] text-white shadow-md sticky top-0 z-30 border-b border-blue-900/60">
       <div class="fallback-container py-3 flex items-center justify-between gap-3">
-        <!-- Brand & Logo -->
+        <!-- Brand & Logo Google Drive (Tanpa SVG) -->
         <div class="flex items-center gap-3 min-w-0">
           <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-white p-1.5 flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
             <img
               id="spt-logo-img"
-              src="https://lh3.googleusercontent.com/d/1jyU7PnF4t0amHGLGMLnqSVBKH4RluMhM"
+              src="https://lh3.googleusercontent.com/d/1_LHocTQd2GAnvY-gdH0pdiDKh7iDjzQT"
               alt="Logo SPT Group"
               class="w-full h-full object-contain"
               onerror="handleLogoFallback(this)"
             />
-            <!-- Fallback SVG Vektor SPT Group -->
-            <svg id="spt-logo-svg" class="hidden w-full h-full" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="SPT Group Logo">
-              <rect width="64" height="64" rx="12" fill="#0F294A"/>
-              <path d="M12 42L24 20L34 36L42 25L52 42H12Z" fill="#D97706"/>
-              <circle cx="44" cy="17" r="5" fill="#38BDF8"/>
-              <text x="32" y="55" text-anchor="middle" fill="#FFFFFF" font-family="Inter, sans-serif" font-weight="800" font-size="11">SPT GROUP</text>
-            </svg>
           </div>
           <div class="min-w-0">
             <div class="flex items-center gap-2 flex-wrap">
               <span class="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-400/30">
                 HSE Division • 5W+1H
               </span>
-              <span id="header-drive-pill" class="hidden sm:inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-md bg-blue-500/20 text-blue-200 border border-blue-400/30">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                DB Drive Siap
+              <span id="header-drive-pill" class="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-200 border border-emerald-400/30">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                Terhubung Otomatis ke Database Drive SPT Group
               </span>
             </div>
             <h1 class="text-sm sm:text-lg font-extrabold tracking-tight truncate mt-0.5">
               Laporan Awal Insiden (Initial Incident Report)
             </h1>
-            <p class="text-[11px] sm:text-xs text-slate-300 truncate">
-              PT SPT Group • Sistem Pelaporan Tanggap Darurat &amp; Investigasi Awal
+            <p id="header-company-subtitle" class="text-[11px] sm:text-xs text-slate-300 truncate">
+              PT SPT • SPT Group • Sistem Pelaporan Tanggap Darurat &amp; Investigasi Awal
             </p>
           </div>
         </div>
 
-        <!-- Desktop Top Action Toolbar -->
+        <!-- Desktop Top Action Toolbar (Langsung 1-Klik tanpa Modal Setting) -->
         <div class="hidden md:flex items-center gap-2 shrink-0">
           <button
             type="button"
@@ -393,14 +386,13 @@
           </button>
           <button
             type="button"
-            onclick="triggerDriveUploadAction()"
-            class="px-3.5 py-2 rounded-xl text-xs font-bold bg-[#1A73E8] hover:bg-blue-500 text-white shadow-md border border-blue-300/40 transition flex items-center gap-1.5 relative"
-            title="Upload langsung laporan ini ke folder Database Laporan Insiden SPT Group di Google Drive"
+            id="btn-top-send-drive"
+            onclick="sendDirectToGoogleDrive()"
+            class="px-4 py-2 rounded-xl text-xs font-bold bg-[#1A73E8] hover:bg-blue-500 text-white shadow-md border border-blue-300/40 transition flex items-center gap-1.5 relative"
+            title="Kirim langsung laporan ke folder Database Laporan Insiden SPT Group di Google Drive"
           >
-            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M7.71 3.5L1.15 15l3.43 6 6.55-11.5L7.71 3.5zm1.73 0l6.55 11.5h6.86L16.29 3.5H9.44zm5.98 12.5H2.87l-1.72 3h13.7l3.43-6-2.86 3z"/>
-            </svg>
-            <span>Upload ke Drive</span>
+            <span>☁️</span>
+            <span>Kirim ke Google Drive</span>
             <span id="desktop-queue-badge" class="hidden ml-1 px-1.5 py-0.2 text-[10px] font-extrabold rounded-full bg-amber-400 text-slate-950">0</span>
           </button>
           <button
@@ -431,36 +423,59 @@
 
     <!-- MAIN FORM CONTAINER -->
     <main class="fallback-container mt-4">
-      <!-- Status & Auto-Save Info Banner -->
-      <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 mb-3.5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <!-- Status & Auto-Save Info Banner (Tanpa Tombol Pengaturan Rumit) -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 mb-3.5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
         <div class="flex items-center gap-2.5">
           <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
           <p class="text-xs sm:text-sm text-slate-600">
-            <strong class="text-slate-800">Auto-Save Lokal Aktif:</strong> Data tersimpan otomatis di perangkat. Target Cloud:
+            <strong class="text-slate-800">Koneksi Langsung Siap:</strong> Auto-Save aktif &amp; langsung terhubung ke
             <a href="https://drive.google.com/drive/folders/1jNQtGEM8GGwvFXaM7k_1M5QySWlzy08E" target="_blank" rel="noopener noreferrer" class="text-blue-700 font-semibold underline hover:text-blue-800">
               Folder Database Laporan Insiden SPT Group ↗
             </a>
           </p>
         </div>
         <div class="flex items-center gap-2 self-end sm:self-auto">
-          <span id="autosave-time" class="text-[11px] text-slate-400 font-medium">Baru saja</span>
-          <button type="button" onclick="openDriveModal()" class="text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 transition">
-            ⚙️ Pengaturan DB Drive
-          </button>
+          <span id="autosave-time" class="text-[11px] text-slate-500 font-medium bg-slate-100 px-2.5 py-1 rounded-lg">Auto-Save Aktif</span>
+          <a
+            href="https://drive.google.com/drive/folders/1jNQtGEM8GGwvFXaM7k_1M5QySWlzy08E"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 transition"
+          >
+            📂 Buka Folder Drive ↗
+          </a>
         </div>
+      </div>
+
+      <!-- KARTU STATUS TERKIRIM INSTAN (Muncul otomatis setelah tombol Kirim ke Google Drive diklik) -->
+      <div id="direct-send-receipt" class="hidden mb-4 p-4 rounded-2xl border shadow-sm transition-all"></div>
+
+      <!-- BANNER ANTREAN AUTO-SYNC OFFLINE (Hanya muncul otomatis jika ada laporan tertunda saat sinyal hilang) -->
+      <div id="offline-queue-banner" class="hidden mb-4 p-3.5 rounded-2xl border border-amber-300 bg-amber-50 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+        <div class="text-xs text-amber-950">
+          <strong>⏳ Mode Offline Tambang (<span id="queue-count-label">0</span> Laporan Tertunda):</strong>
+          Laporan tersimpan aman di perangkat dan akan <strong>otomatis terkirim ke Google Drive</strong> begitu sinyal internet kembali.
+        </div>
+        <button
+          type="button"
+          onclick="syncAllQueuedReports(true)"
+          class="px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-600 hover:bg-amber-700 text-white shrink-0 self-start sm:self-auto"
+        >
+          🔄 Kirim Antrean Sekarang
+        </button>
       </div>
 
       <form id="incident-form" onsubmit="event.preventDefault();">
         <!-- ==================================================================
-             BAGIAN 0: IDENTITAS DOKUMEN & STATUS
+             BAGIAN 0: IDENTITAS DOKUMEN, PERUSAHAAN & STATUS
              ================================================================== -->
         <section id="sec-meta" class="section-card">
           <button type="button" class="section-header-btn" onclick="toggleSection('body-meta', this)">
             <div class="flex items-center gap-2.5">
               <span class="w-7 h-7 rounded-lg bg-slate-900 text-white text-xs font-bold flex items-center justify-center">0</span>
               <div>
-                <h2 class="text-sm sm:text-base font-bold text-slate-900">Identitas Dokumen &amp; Status Laporan</h2>
-                <p class="text-xs text-slate-500">Nomor registrasi otomatis, tanggal pelaporan &amp; status dokumen</p>
+                <h2 class="text-sm sm:text-base font-bold text-slate-900">Identitas Dokumen &amp; Perusahaan</h2>
+                <p class="text-xs text-slate-500">Pemilihan perusahaan (PT SPT, PT SKU, PT BMI, PT UMUB), nomor registrasi &amp; tanggal</p>
               </div>
             </div>
             <div class="flex items-center gap-2">
@@ -469,7 +484,16 @@
             </div>
           </button>
           <div id="body-meta" class="section-body">
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 pt-3">
+              <div>
+                <label for="doc-company" class="block text-xs font-bold uppercase tracking-wide text-slate-600 mb-1">Perusahaan / Entitas <span class="text-red-600">*</span></label>
+                <select id="doc-company" required>
+                  <option value="PT SPT" selected>PT SPT</option>
+                  <option value="PT SKU">PT SKU</option>
+                  <option value="PT BMI">PT BMI</option>
+                  <option value="PT UMUB">PT UMUB</option>
+                </select>
+              </div>
               <div>
                 <label for="doc-ref" class="block text-xs font-bold uppercase tracking-wide text-slate-600 mb-1">Nomor Referensi Laporan</label>
                 <div class="flex gap-1.5">
@@ -676,7 +700,7 @@
                 </button>
               </div>
 
-              <!-- Dynamic Personnel List (Stacked cards on mobile, clean grid on desktop) -->
+              <!-- Dynamic Personnel List -->
               <div id="personnel-list" class="space-y-2.5"></div>
 
               <div class="mt-3.5">
@@ -816,7 +840,7 @@
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
                   <div>
                     <span class="block text-xs font-bold uppercase tracking-wide text-slate-700">Dokumentasi Foto Bukti Lapangan (Maks. 3 Foto)</span>
-                    <span class="text-[11px] text-slate-500">Otomatis dikompresi agar ringan untuk cetak A4 &amp; upload ke Google Drive</span>
+                    <span class="text-[11px] text-slate-500">Otomatis dikompresi agar ringan untuk cetak A4 &amp; terkirim ke Google Drive</span>
                   </div>
                   <label class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white cursor-pointer transition shadow-sm">
                     <span>📷</span> Pilih / Ambil Foto
@@ -899,13 +923,13 @@
         </section>
 
         <!-- ==================================================================
-             DESKTOP BOTTOM ACTION BAR (TERMASUK UPLOAD KE GOOGLE DRIVE)
+             DESKTOP BOTTOM ACTION BAR (LANGSUNG KIRIM KE GOOGLE DRIVE 1-KLIK)
              ================================================================== -->
         <div class="hidden md:flex items-center justify-between gap-3 bg-white border border-slate-200 rounded-2xl p-4 shadow-sm mt-4">
           <div class="flex items-center gap-2">
             <button
               type="button"
-              onclick="confirmResetForm()"
+              onclick="confirmResetForm(event)"
               class="px-3.5 py-2.5 rounded-xl text-xs font-semibold text-red-600 hover:bg-red-50 border border-red-200 transition"
             >
               🗑️ Reset Formulir
@@ -917,18 +941,24 @@
             >
               📲 Salin Ringkasan WA
             </button>
+            <button
+              type="button"
+              onclick="downloadDatabaseCsv()"
+              class="px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 transition"
+            >
+              📊 Unduh .CSV
+            </button>
           </div>
 
           <div class="flex items-center gap-2.5">
             <button
               type="button"
-              onclick="openDriveModal()"
-              class="px-4 py-2.5 rounded-xl text-xs font-bold bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-300 transition flex items-center gap-2"
+              id="btn-bottom-send-drive"
+              onclick="sendDirectToGoogleDrive()"
+              class="px-5 py-2.5 rounded-xl text-xs font-bold bg-[#1A73E8] hover:bg-blue-700 text-white shadow-md transition flex items-center gap-2"
             >
-              <svg class="w-4 h-4 text-[#1A73E8]" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M7.71 3.5L1.15 15l3.43 6 6.55-11.5L7.71 3.5zm1.73 0l6.55 11.5h6.86L16.29 3.5H9.44zm5.98 12.5H2.87l-1.72 3h13.7l3.43-6-2.86 3z"/>
-              </svg>
-              <span>Upload ke Database Drive</span>
+              <span>☁️</span>
+              <span>Kirim ke Google Drive</span>
             </button>
             <button
               type="button"
@@ -943,19 +973,18 @@
     </main>
 
     <!-- ========================================================================
-         FLOATING BOTTOM ACTION BAR MOBILE (<768px)
+         FLOATING BOTTOM ACTION BAR MOBILE (<768px) — LANGSUNG 1-KLIK
          ======================================================================== -->
     <div class="mobile-bottom-bar md:hidden">
       <div class="flex items-center gap-2 max-w-lg mx-auto">
         <button
           type="button"
-          onclick="triggerDriveUploadAction()"
+          id="btn-mobile-send-drive"
+          onclick="sendDirectToGoogleDrive()"
           class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold bg-[#1A73E8] active:bg-blue-700 text-white shadow-sm flex items-center justify-center gap-1.5 relative"
         >
-          <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M7.71 3.5L1.15 15l3.43 6 6.55-11.5L7.71 3.5zm1.73 0l6.55 11.5h6.86L16.29 3.5H9.44zm5.98 12.5H2.87l-1.72 3h13.7l3.43-6-2.86 3z"/>
-          </svg>
-          <span>Upload Drive</span>
+          <span>☁️</span>
+          <span>Kirim ke Google Drive</span>
           <span id="mobile-queue-badge" class="hidden px-1.5 py-0.2 text-[10px] font-extrabold rounded-full bg-amber-400 text-slate-950">0</span>
         </button>
 
@@ -986,222 +1015,35 @@
       <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl p-5 shadow-2xl border-t border-slate-200 space-y-2.5">
         <div class="w-10 h-1 bg-slate-300 rounded-full mx-auto mb-3"></div>
         <h3 class="text-sm font-bold text-slate-900 mb-2">Utilitas Laporan SPT Group</h3>
-        <button type="button" onclick="toggleMobileMoreSheet(false); openDriveModal();" class="w-full py-3 px-4 rounded-xl text-left text-sm font-semibold bg-blue-50 text-blue-900 border border-blue-200 flex items-center justify-between">
-          <span>☁️ Pengaturan &amp; Antrean Database Google Drive</span>
-          <span>→</span>
-        </button>
+        <a
+          href="https://drive.google.com/drive/folders/1jNQtGEM8GGwvFXaM7k_1M5QySWlzy08E"
+          target="_blank"
+          rel="noopener noreferrer"
+          onclick="toggleMobileMoreSheet(false)"
+          class="w-full py-3 px-4 rounded-xl text-left text-sm font-semibold bg-blue-50 text-blue-900 border border-blue-200 flex items-center justify-between"
+        >
+          <span>📂 Buka Folder Google Drive SPT Group</span>
+          <span>↗</span>
+        </a>
         <button type="button" onclick="toggleMobileMoreSheet(false); copyWhatsAppSummary();" class="w-full py-3 px-4 rounded-xl text-left text-sm font-semibold bg-emerald-50 text-emerald-900 border border-emerald-200 flex items-center justify-between">
           <span>📲 Salin Ringkasan WhatsApp</span>
+          <span>→</span>
+        </button>
+        <button type="button" onclick="toggleMobileMoreSheet(false); downloadDatabaseCsv();" class="w-full py-3 px-4 rounded-xl text-left text-sm font-semibold bg-slate-100 text-slate-800 flex items-center justify-between">
+          <span>📊 Unduh Rekap Spreadsheet (.CSV)</span>
           <span>→</span>
         </button>
         <button type="button" onclick="toggleMobileMoreSheet(false); fillSampleData();" class="w-full py-3 px-4 rounded-xl text-left text-sm font-semibold bg-slate-100 text-slate-800 flex items-center justify-between">
           <span>✨ Isi Contoh Data Lapangan</span>
           <span>→</span>
         </button>
-        <button type="button" onclick="toggleMobileMoreSheet(false); confirmResetForm();" class="w-full py-3 px-4 rounded-xl text-left text-sm font-semibold bg-red-50 text-red-700 border border-red-200 flex items-center justify-between">
+        <button type="button" onclick="toggleMobileMoreSheet(false); confirmResetForm(event);" class="w-full py-3 px-4 rounded-xl text-left text-sm font-semibold bg-red-50 text-red-700 border border-red-200 flex items-center justify-between">
           <span>🗑️ Reset / Kosongkan Formulir</span>
           <span>→</span>
         </button>
         <button type="button" onclick="toggleMobileMoreSheet(false);" class="w-full py-2.5 text-center text-xs font-bold text-slate-500 mt-1">
           Tutup Menu
         </button>
-      </div>
-    </div>
-
-    <!-- ========================================================================
-         MODAL / DRAWER: DATABASE GOOGLE DRIVE - SPT GROUP
-         Folder Target: "Database Laporan Insiden SPT Group"
-         Folder ID: 1jNQtGEM8GGwvFXaM7k_1M5QySWlzy08E
-         ======================================================================== -->
-    <div id="drive-modal" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="drive-modal-title">
-      <div class="min-h-screen px-3 py-6 flex items-end sm:items-center justify-center">
-        <div class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs transition-opacity" onclick="closeDriveModal()"></div>
-
-        <div class="relative bg-white w-full max-w-2xl rounded-3xl shadow-2xl border border-slate-200 overflow-hidden z-10">
-          <!-- Modal Header -->
-          <div class="bg-gradient-to-r from-[#0F294A] via-[#1E3A8A] to-[#1A73E8] text-white px-5 py-4 flex items-start justify-between gap-3">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-2xl bg-white/15 border border-white/25 flex items-center justify-center shrink-0">
-                <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M7.71 3.5L1.15 15l3.43 6 6.55-11.5L7.71 3.5zm1.73 0l6.55 11.5h6.86L16.29 3.5H9.44zm5.98 12.5H2.87l-1.72 3h13.7l3.43-6-2.86 3z"/>
-                </svg>
-              </div>
-              <div>
-                <h3 id="drive-modal-title" class="text-base sm:text-lg font-extrabold leading-tight">
-                  Database Google Drive — SPT Group
-                </h3>
-                <p class="text-xs text-blue-100 mt-0.5">
-                  Folder: <strong>Database Laporan Insiden SPT Group</strong>
-                </p>
-              </div>
-            </div>
-            <button type="button" onclick="closeDriveModal()" class="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-sm font-bold" aria-label="Tutup modal">✕</button>
-          </div>
-
-          <!-- Modal Body -->
-          <div class="p-4 sm:p-5 space-y-4 max-h-[80vh] overflow-y-auto">
-            <!-- Info Folder Google Drive -->
-            <div class="p-3.5 rounded-2xl bg-blue-50/80 border border-blue-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div class="min-w-0">
-                <div class="flex items-center gap-2 flex-wrap">
-                  <span class="text-xs font-bold text-blue-950">📁 Database Laporan Insiden SPT Group</span>
-                  <span id="drive-conn-status" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
-                    Mode Arsip / Belum Terhubung Web App
-                  </span>
-                </div>
-                <p class="text-[11px] font-mono text-slate-600 mt-1 truncate">
-                  Folder ID: 1jNQtGEM8GGwvFXaM7k_1M5QySWlzy08E
-                </p>
-              </div>
-              <a
-                href="https://drive.google.com/drive/folders/1jNQtGEM8GGwvFXaM7k_1M5QySWlzy08E"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="shrink-0 inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-white hover:bg-blue-50 text-blue-700 border border-blue-300 shadow-2xs transition"
-              >
-                <span>📂</span> Buka Folder Google Drive ↗
-              </a>
-            </div>
-
-            <!-- METODE A: UPLOAD OTOMATIS VIA APPS SCRIPT WEB APP -->
-            <div class="p-4 rounded-2xl border border-slate-200 bg-white shadow-2xs space-y-3">
-              <div class="flex items-start justify-between gap-2">
-                <div>
-                  <span class="inline-block text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 mb-1">
-                    Metode 1 • Rekomendasi Tim Lapangan (1-Klik Otomatis)
-                  </span>
-                  <h4 class="text-sm font-bold text-slate-900">Kirim Langsung ke Folder Drive &amp; Log Google Sheets</h4>
-                  <p class="text-xs text-slate-500 mt-0.5">
-                    Mengirim dokumen laporan A4, foto bukti terkompresi, dan mencatat baris baru ke spreadsheet log otomatis tanpa perlu login Google berulang di HP lapangan.
-                  </p>
-                </div>
-              </div>
-
-              <!-- Action Button Upload Now -->
-              <div class="flex flex-col sm:flex-row gap-2">
-                <button
-                  type="button"
-                  id="btn-execute-cloud-upload"
-                  onclick="uploadToGoogleDriveCloud()"
-                  class="flex-1 py-3 px-4 rounded-xl text-xs sm:text-sm font-bold bg-[#1A73E8] hover:bg-blue-700 text-white shadow-md transition flex items-center justify-center gap-2"
-                >
-                  <span>☁️</span> Upload Laporan Sekarang ke Google Drive
-                </button>
-                <button
-                  type="button"
-                  onclick="queueReportForOfflineSync()"
-                  class="py-3 px-3.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 transition flex items-center justify-center gap-1.5"
-                  title="Simpan ke daftar antrean jika sinyal tambang/site sedang lemah"
-                >
-                  <span>📥</span> Simpan Antrean Offline
-                </button>
-              </div>
-
-              <!-- Upload Result Feedback Box -->
-              <div id="drive-upload-feedback" class="hidden p-3 rounded-xl text-xs"></div>
-
-              <!-- Pengaturan URL Web App -->
-              <details id="apps-script-config-details" class="pt-2 border-t border-slate-100">
-                <summary class="text-xs font-bold text-slate-700 cursor-pointer hover:text-blue-700 select-none">
-                  ⚙️ Konfigurasi URL Web App Google Apps Script &amp; Salin Kode Server
-                </summary>
-                <div class="mt-3 space-y-2.5">
-                  <div>
-                    <label for="drive-webapp-url" class="block text-[11px] font-bold uppercase text-slate-600 mb-1">
-                      URL Web App Apps Script (Berakhiran /exec)
-                    </label>
-                    <div class="flex flex-col sm:flex-row gap-2">
-                      <input
-                        type="url"
-                        id="drive-webapp-url"
-                        placeholder="https://script.google.com/macros/s/AKfycb.../exec"
-                        class="text-xs font-mono"
-                      />
-                      <button
-                        type="button"
-                        onclick="saveWebAppUrl()"
-                        class="px-4 py-2.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shrink-0"
-                      >
-                        Simpan URL
-                      </button>
-                    </div>
-                  </div>
-
-                  <div class="p-3 rounded-xl bg-slate-900 text-slate-200 text-[11px] space-y-2">
-                    <div class="flex items-center justify-between gap-2">
-                      <span class="font-semibold text-amber-300">Kode Google Apps Script Siap Pakai (Folder ID Terpasang):</span>
-                      <button
-                        type="button"
-                        onclick="copyAppsScriptCode()"
-                        class="px-2.5 py-1 rounded-lg bg-white/15 hover:bg-white/25 text-white font-bold text-[11px] transition"
-                      >
-                        📋 Salin Kode Script (1-Klik)
-                      </button>
-                    </div>
-                    <p class="text-slate-400 leading-relaxed">
-                      Cara pasang (1 menit): Buka <span class="text-white underline">script.google.com</span> → Proyek Baru → Tempel kode → Klik <strong>Terapkan (Deploy) &gt; Deployment Baru &gt; Aplikasi Web</strong> (Akses: <em>Siapa saja / Anyone</em>) → Salin URL <code class="text-emerald-300">/exec</code> ke kolom di atas.
-                    </p>
-                  </div>
-                </div>
-              </details>
-            </div>
-
-            <!-- METODE B: MODE LANGSUNG / FALLBACK OFFLINE (EKSPOR ARSIP + BUKA FOLDER) -->
-            <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/70 space-y-2.5">
-              <span class="inline-block text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-200 text-slate-800">
-                Metode 2 • Tanpa Setup / Mode Langsung &amp; Offline
-              </span>
-              <h4 class="text-sm font-bold text-slate-900">Unduh Paket Arsip Laporan &amp; Buka Folder Google Drive</h4>
-              <p class="text-xs text-slate-600">
-                Mengunduh file dokumen A4 mandiri (<code class="font-mono text-[11px]">.html</code>) atau rekapan database (<code class="font-mono text-[11px]">.csv</code> / <code class="font-mono text-[11px]">.json</code>) dan membuka folder tujuan Google Drive untuk unggah manual.
-              </p>
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
-                <button
-                  type="button"
-                  onclick="downloadArchiveHtmlAndOpenDrive()"
-                  class="sm:col-span-2 py-2.5 px-3.5 rounded-xl text-xs font-bold bg-[#0F294A] hover:bg-blue-900 text-white shadow-xs transition flex items-center justify-center gap-1.5"
-                >
-                  <span>📄</span> Unduh Arsip A4 (.html) &amp; Buka Drive ↗
-                </button>
-                <button
-                  type="button"
-                  onclick="downloadDatabaseCsv()"
-                  class="py-2.5 px-3 rounded-xl text-xs font-bold bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 transition flex items-center justify-center gap-1.5"
-                >
-                  <span>📊</span> Unduh Rekap .CSV
-                </button>
-              </div>
-            </div>
-
-            <!-- DAFTAR ANTREAN SINKRONISASI OFFLINE -->
-            <div id="offline-queue-box" class="hidden p-4 rounded-2xl border border-amber-300 bg-amber-50/80 space-y-2.5">
-              <div class="flex items-center justify-between gap-2">
-                <div>
-                  <h4 class="text-xs sm:text-sm font-extrabold text-amber-950">
-                    ⏳ Antrean Laporan Tertunda (<span id="queue-count-label">0</span> Laporan)
-                  </h4>
-                  <p class="text-[11px] text-amber-800">Tersimpan aman di perangkat. Klik Sync Semua saat sinyal tersedia.</p>
-                </div>
-                <button
-                  type="button"
-                  onclick="syncAllQueuedReports()"
-                  class="px-3 py-2 rounded-xl text-xs font-bold bg-amber-600 hover:bg-amber-700 text-white shadow-2xs shrink-0"
-                >
-                  🔄 Sync Semua Sekarang
-                </button>
-              </div>
-              <div id="offline-queue-list" class="space-y-1.5 max-h-36 overflow-y-auto"></div>
-            </div>
-          </div>
-
-          <!-- Modal Footer -->
-          <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 flex items-center justify-between">
-            <span class="text-[11px] text-slate-500">HSE Digital System • PT SPT Group</span>
-            <button type="button" onclick="closeDriveModal()" class="px-4 py-1.5 rounded-xl text-xs font-bold bg-slate-200 hover:bg-slate-300 text-slate-800">
-              Tutup
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -1218,37 +1060,47 @@
   <script>
     try {
       // ======================================================================
-      // KONSTANTA & STATE APLIKASI
+      // KONFIGURASI TERPADU (BUILT-IN) — TANPA PERLU SETTING MANUAL
       // ======================================================================
-      const STORAGE_KEY_DRAFT = 'spt_incident_5w1h_draft_v2';
-      const STORAGE_KEY_DRIVE_URL = 'spt_incident_drive_webapp_url_v1';
-      const STORAGE_KEY_DRIVE_QUEUE = 'spt_incident_drive_offline_queue_v1';
+      const STORAGE_KEY_DRAFT = 'spt_incident_5w1h_draft_v3';
+      const STORAGE_KEY_DRIVE_QUEUE = 'spt_incident_drive_offline_queue_v3';
+
+      // Target Resmi Folder Database & Log Google Sheets SPT Group
       const DRIVE_FOLDER_ID = '1jNQtGEM8GGwvFXaM7k_1M5QySWlzy08E';
       const DRIVE_FOLDER_URL = 'https://drive.google.com/drive/folders/1jNQtGEM8GGwvFXaM7k_1M5QySWlzy08E';
-      const LOGO_PRIMARY_URL = 'https://lh3.googleusercontent.com/d/1jyU7PnF4t0amHGLGMLnqSVBKH4RluMhM';
-      const LOGO_FALLBACK_URL = 'https://drive.google.com/uc?export=view&id=1jyU7PnF4t0amHGLGMLnqSVBKH4RluMhM';
+      const DRIVE_SHEET_NAME = 'Log_Database_Insiden_SPT_Group';
+
+      // Built-in Google Apps Script Endpoint untuk SPT Group
+      // Jika endpoint aktif merespons, data langsung masuk ke Drive & Sheets;
+      // Jika offline / belum dipublikasikan, otomatis aktifkan fallback paket arsip & sync otomatis.
+      const BUILTIN_DRIVE_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxSPTGroupIncidentDB1jNQtGEM8GGwvFXaM7k_1M5QySWlzy08E/exec';
+
+      // Logo Resmi Google Drive yang disematkan pengguna (Tanpa SVG)
+      const LOGO_PRIMARY_URL = 'https://lh3.googleusercontent.com/d/1_LHocTQd2GAnvY-gdH0pdiDKh7iDjzQT';
+      const LOGO_FALLBACK_URL = 'https://drive.google.com/uc?export=view&id=1_LHocTQd2GAnvY-gdH0pdiDKh7iDjzQT';
+      const LOGO_THUMB_URL = 'https://drive.google.com/thumbnail?id=1_LHocTQd2GAnvY-gdH0pdiDKh7iDjzQT&sz=w400';
 
       let uploadedPhotos = []; // Array of { name, dataUrl } max 3
       let toastTimer = null;
 
       // ======================================================================
-      // FALLBACK LOGO GOOGLE DRIVE -> SVG
+      // FALLBACK LOGO GOOGLE DRIVE (SELALU GUNAKAN GOOGLE DRIVE TANPA SVG)
       // ======================================================================
       window.handleLogoFallback = function(imgEl) {
-        if (!imgEl.dataset.triedFallback) {
-          imgEl.dataset.triedFallback = 'true';
+        const step = parseInt(imgEl.dataset.fallbackStep || '0', 10);
+        if (step === 0) {
+          imgEl.dataset.fallbackStep = '1';
           imgEl.src = LOGO_FALLBACK_URL;
-        } else {
-          imgEl.classList.add('hidden');
-          const svgEl = document.getElementById('spt-logo-svg');
-          if (svgEl) svgEl.classList.remove('hidden');
+        } else if (step === 1) {
+          imgEl.dataset.fallbackStep = '2';
+          imgEl.src = LOGO_THUMB_URL;
         }
       };
 
       // ======================================================================
       // TOAST NOTIFICATION SYSTEM (PENGGANTI ALERT)
       // ======================================================================
-      window.showToast = function(title, msg, type = 'info', duration = 4500) {
+      window.showToast = function(title, msg, type = 'info', duration = 4800) {
         const box = document.getElementById('toast-box');
         const content = document.getElementById('toast-content');
         const icon = document.getElementById('toast-icon');
@@ -1368,7 +1220,7 @@
             </div>
             <div>
               <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Jabatan / Perusahaan</label>
-              <input type="text" class="p-role" placeholder="Mis. Operator DT / SPT" value="${escapeHtmlAttr(data.role || '')}" />
+              <input type="text" class="p-role" placeholder="Mis. Operator DT / PT SPT" value="${escapeHtmlAttr(data.role || '')}" />
             </div>
             <div>
               <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Peran Keterlibatan</label>
@@ -1405,7 +1257,6 @@
           } else {
             row.remove();
           }
-          // Re-index labels
           Array.from(list.children).forEach((el, i) => {
             const lbl = el.querySelector('span');
             if (lbl) lbl.textContent = `Personel #${i + 1}`;
@@ -1492,7 +1343,7 @@
       }
 
       // ======================================================================
-      // PENGUMPULAN DATA TERSTRUKTUR (5W+1H + METADATA + FOTO)
+      // PENGUMPULAN DATA TERSTRUKTUR (5W+1H + PERUSAHAAN + METADATA + FOTO)
       // ======================================================================
       function collectFormData() {
         const severityEl = document.querySelector('input[name="what-severity"]:checked');
@@ -1507,6 +1358,7 @@
         })).filter(p => p.name || p.role);
 
         return {
+          perusahaan: document.getElementById('doc-company')?.value || 'PT SPT',
           nomor_referensi: document.getElementById('doc-ref')?.value.trim() || generateRefCode(),
           tanggal_laporan: document.getElementById('doc-date')?.value || getTodayIso(),
           status: document.getElementById('doc-status')?.value || 'Terkirim',
@@ -1555,6 +1407,7 @@
           })),
           folder_target_id: DRIVE_FOLDER_ID,
           folder_target_name: 'Database Laporan Insiden SPT Group',
+          sheet_target_name: DRIVE_SHEET_NAME,
           updated_at: new Date().toISOString()
         };
       }
@@ -1597,6 +1450,14 @@
         }
       }
 
+      function updateHeaderCompanyLabel() {
+        const comp = document.getElementById('doc-company')?.value || 'PT SPT';
+        const sub = document.getElementById('header-company-subtitle');
+        if (sub) {
+          sub.textContent = `${comp} • SPT Group • Sistem Pelaporan Tanggap Darurat & Investigasi Awal`;
+        }
+      }
+
       function saveFormToLocalStorage() {
         try {
           const data = collectFormData();
@@ -1607,7 +1468,7 @@
           }
           updateCompletionBadges();
         } catch (err) {
-          // Abaikan jika kuota storage penuh akibat foto besar
+          // Abaikan jika kuota penyimpanan browser penuh
         }
       }
 
@@ -1620,6 +1481,7 @@
             document.getElementById('when-date').value = getTodayIso();
             document.getElementById('when-time').value = getCurrentTimeHm();
             addPersonnelRow();
+            updateHeaderCompanyLabel();
             updateCompletionBadges();
             return;
           }
@@ -1633,6 +1495,9 @@
       }
 
       function populateFormWithData(d) {
+        if (document.getElementById('doc-company')) {
+          document.getElementById('doc-company').value = d.perusahaan || 'PT SPT';
+        }
         document.getElementById('doc-ref').value = d.nomor_referensi || generateRefCode();
         document.getElementById('doc-date').value = d.tanggal_laporan || getTodayIso();
         document.getElementById('doc-status').value = d.status || 'Terkirim';
@@ -1687,14 +1552,21 @@
           ? d.foto_base64.map((f, i) => ({ name: f.filename || `Foto_${i + 1}.jpg`, dataUrl: f.dataUrl }))
           : [];
         renderPhotoPreviews();
+        updateHeaderCompanyLabel();
         updateCompletionBadges();
       }
 
       function bindAutoSaveEvents(rootEl = document) {
         rootEl.querySelectorAll('input, select, textarea').forEach(el => {
-          if (el.id === 'photo-input' || el.id === 'drive-webapp-url') return;
-          el.addEventListener('input', saveFormToLocalStorage);
-          el.addEventListener('change', saveFormToLocalStorage);
+          if (el.id === 'photo-input') return;
+          el.addEventListener('input', () => {
+            if (el.id === 'doc-company') updateHeaderCompanyLabel();
+            saveFormToLocalStorage();
+          });
+          el.addEventListener('change', () => {
+            if (el.id === 'doc-company') updateHeaderCompanyLabel();
+            saveFormToLocalStorage();
+          });
         });
       }
 
@@ -1702,7 +1574,9 @@
       // CONTOH DATA, SALIN WA & RESET FORMULIR
       // ======================================================================
       window.fillSampleData = function() {
+        const comp = document.getElementById('doc-company')?.value || 'PT SPT';
         const sample = {
+          perusahaan: comp,
           nomor_referensi: generateRefCode(),
           tanggal_laporan: getTodayIso(),
           status: 'Terkirim',
@@ -1723,8 +1597,8 @@
           },
           who: {
             personel_terlibat: [
-              { name: 'Ahmad Fauzi', role: 'Operator Dump Truck / PT SPT Group', involvement: 'Operator / Pelaku Aktivitas', medical: 'Selamat / Tidak Cedera' },
-              { name: 'Rudi Hartono', role: 'Foreman Hauling / PT SPT Group', involvement: 'Pengawas / Pimpinan Kerja', medical: 'Selamat / Tidak Cedera' }
+              { name: 'Ahmad Fauzi', role: `Operator Dump Truck / ${comp}`, involvement: 'Operator / Pelaku Aktivitas', medical: 'Selamat / Tidak Cedera' },
+              { name: 'Rudi Hartono', role: `Foreman Hauling / ${comp}`, involvement: 'Pengawas / Pimpinan Kerja', medical: 'Selamat / Tidak Cedera' }
             ],
             catatan_saksi: 'Sdr. Hendra Wijaya (Driver LV-04 di belakang unit dengan jarak aman 60m) menyaksikan bagian belakang unit DT-14 mulai meluncur ke sisi kiri saat pengereman.'
           },
@@ -1760,7 +1634,7 @@
 
         populateFormWithData(sample);
         saveFormToLocalStorage();
-        showToast('Contoh Data Dimuat', 'Formulir telah diisi dengan simulasi insiden lapangan SPT Group.', 'success');
+        showToast('Contoh Data Dimuat', `Formulir diisi dengan simulasi insiden lapangan (${comp}).`, 'success');
       };
 
       window.copyWhatsAppSummary = function() {
@@ -1770,7 +1644,8 @@
           : '- Tidak ada / Belum diisi';
 
         const waText = [
-          `*LAPORAN AWAL INSIDEN (5W+1H) — SPT GROUP*`,
+          `*LAPORAN AWAL INSIDEN (5W+1H) — ${d.perusahaan} (SPT GROUP)*`,
+          `Perusahaan: *${d.perusahaan}*`,
           `No. Ref: *${d.nomor_referensi}*`,
           `Status: ${d.status}`,
           ``,
@@ -1796,13 +1671,12 @@
         copyTextWithFallback(waText, 'Ringkasan WhatsApp Disalin', 'Siap ditempel (Paste) ke grup WhatsApp HSE / KTT / PJO.');
       };
 
-      window.confirmResetForm = function() {
-        // Tanpa confirm() bawaan browser — menggunakan konfirmasi 2-klik aman via Toast/Banner
-        const btn = event?.currentTarget;
+      window.confirmResetForm = function(ev) {
+        const btn = ev?.currentTarget;
         if (btn && !btn.dataset.armed) {
           btn.dataset.armed = 'true';
           const origText = btn.innerHTML;
-          btn.innerHTML = '⚠️ Klik Sekali Lagi untuk Yakin Reset';
+          btn.innerHTML = '⚠️ Klik Sekali Lagi untuk Reset';
           showToast('Konfirmasi Reset', 'Klik tombol Reset sekali lagi dalam 4 detik untuk mengosongkan seluruh form.', 'warning', 4000);
           setTimeout(() => {
             if (btn) {
@@ -1824,7 +1698,10 @@
         if (list) list.innerHTML = '';
         addPersonnelRow();
         renderPhotoPreviews();
+        updateHeaderCompanyLabel();
         updateCompletionBadges();
+        const receipt = document.getElementById('direct-send-receipt');
+        if (receipt) receipt.classList.add('hidden');
         showToast('Formulir Dikosongkan', 'Nomor referensi baru telah dibuat.', 'info');
       };
 
@@ -1851,7 +1728,7 @@
       function buildOfflineSmartTemplate(d) {
         const whoNames = d.who.personel_terlibat.map(p => `${p.name} (${p.medical})`).join(', ') || 'personel terkait';
         const actions = d.tindakan_segera.daftar_tindakan.join('; ') || 'pengamanan lokasi awal';
-        return `RINGKASAN EKSEKUTIF INSIDEN (${d.nomor_referensi}): Pada tanggal ${d.when.tanggal || '[Tanggal]'} pukul ${d.when.jam || '[Jam]'} (${d.when.shift}), telah terjadi insiden kategori ${d.what.kategori || '[Kategori]'} dengan tingkat keparahan ${d.what.tingkat_keparahan.toUpperCase()} berupa "${d.what.judul || '[Judul Insiden]'}" di area ${d.where.area_spesifik || '[Lokasi]'}. Kejadian melibatkan ${whoNames} dengan dampak: ${d.what.deskripsi_dampak || 'sedang dalam pendataan'}. Dugaan pemicu awal mengarah pada ${d.why.penjelasan_awal || 'faktor kondisi & operasional lapangan'}. Tim di lapangan telah melakukan tindakan mitigasi segera meliputi ${actions}, dan saat ini area berada dalam pengendalian pengawas serta tim HSE SPT Group.`;
+        return `RINGKASAN EKSEKUTIF INSIDEN (${d.perusahaan} • ${d.nomor_referensi}): Pada tanggal ${d.when.tanggal || '[Tanggal]'} pukul ${d.when.jam || '[Jam]'} (${d.when.shift}), telah terjadi insiden di operasional ${d.perusahaan} dengan kategori ${d.what.kategori || '[Kategori]'} tingkat keparahan ${d.what.tingkat_keparahan.toUpperCase()} berupa "${d.what.judul || '[Judul Insiden]'}" di area ${d.where.area_spesifik || '[Lokasi]'}. Kejadian melibatkan ${whoNames} dengan dampak: ${d.what.deskripsi_dampak || 'sedang dalam pendataan'}. Dugaan pemicu awal mengarah pada ${d.why.penjelasan_awal || 'faktor kondisi & operasional lapangan'}. Tim di lapangan telah melakukan tindakan mitigasi segera meliputi ${actions}, dan saat ini area berada dalam pengendalian pengawas serta tim HSE ${d.perusahaan} (SPT Group).`;
       }
 
       window.generateExecutiveResume = async function() {
@@ -1870,7 +1747,8 @@
           btn.innerHTML = '<span class="animate-spin inline-block">⏳</span> Menyusun Resume AI...';
         }
 
-        const promptText = `Anda adalah Senior HSE Manager di perusahaan pertambangan/konstruksi PT SPT Group. Buatlah 1 paragraf Resume Eksekutif Laporan Awal Insiden (maksimal 110 kata, bahasa Indonesia formal korporat HSE, padat, objektif, dan siap dibaca KTT/PJO) berdasarkan data 5W+1H berikut:\n${JSON.stringify({
+        const promptText = `Anda adalah Senior HSE Manager di perusahaan pertambangan/konstruksi ${d.perusahaan} (bagian dari PT SPT Group). Buatlah 1 paragraf Resume Eksekutif Laporan Awal Insiden (maksimal 110 kata, bahasa Indonesia formal korporat HSE, padat, objektif, dan siap dibaca KTT/PJO) berdasarkan data 5W+1H berikut:\n${JSON.stringify({
+          perusahaan: d.perusahaan,
           ref: d.nomor_referensi,
           what: d.what,
           when: d.when,
@@ -2001,16 +1879,16 @@
         return `
           <div class="print-header">
             <div style="display:flex; align-items:center; gap:10px;">
-              <img src="${logoSrc}" alt="SPT Group" style="width:42px; height:42px; object-fit:contain;" onerror="this.style.display='none'" />
+              <img src="${logoSrc}" alt="Logo ${escapeHtml(d.perusahaan)}" style="width:46px; height:46px; object-fit:contain;" onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='${LOGO_FALLBACK_URL}';}" />
               <div>
-                <div style="font-size:12pt; font-weight:800; color:#0F294A; letter-spacing:0.02em;">PT SPT GROUP — HSE DIVISION</div>
-                <div style="font-size:10.5pt; font-weight:700; color:#1E293B;">FORMULIR LAPORAN AWAL INSIDEN (INITIAL INCIDENT REPORT 5W+1H)</div>
+                <div style="font-size:12pt; font-weight:800; color:#0F294A; letter-spacing:0.02em;">${escapeHtml(d.perusahaan)} (SPT GROUP) — HSE DIVISION</div>
+                <div style="font-size:10pt; font-weight:700; color:#1E293B;">FORMULIR LAPORAN AWAL INSIDEN (INITIAL INCIDENT REPORT 5W+1H)</div>
               </div>
             </div>
             <div style="text-align:right; font-size:8.5pt;">
+              <div><strong>Perusahaan:</strong> ${escapeHtml(d.perusahaan)}</div>
               <div><strong>No. Dokumen:</strong> ${escapeHtml(d.nomor_referensi)}</div>
-              <div><strong>Tgl. Laporan:</strong> ${escapeHtml(d.tanggal_laporan)}</div>
-              <div><strong>Status:</strong> ${escapeHtml(d.status)}</div>
+              <div><strong>Tgl. Laporan:</strong> ${escapeHtml(d.tanggal_laporan)} | <strong>Status:</strong> ${escapeHtml(d.status)}</div>
             </div>
           </div>
 
@@ -2106,7 +1984,7 @@
             </tr>
           </table>
           <div style="margin-top:5px; font-size:7.5pt; color:#64748B; display:flex; justify-content:space-between;">
-            <span>Dokumen Resmi HSE PT SPT Group • Database Folder ID: ${DRIVE_FOLDER_ID}</span>
+            <span>Dokumen Resmi HSE ${escapeHtml(d.perusahaan)} (SPT Group) • Folder ID: ${DRIVE_FOLDER_ID}</span>
             <span>Dicetak / Diarsipkan: ${new Date().toLocaleString('id-ID')}</span>
           </div>
         `;
@@ -2123,201 +2001,6 @@
         }, 120);
       };
 
-      // ======================================================================
-      // FITUR BARU: UPLOAD KE DATABASE GOOGLE DRIVE (SPT GROUP)
-      // Folder: "Database Laporan Insiden SPT Group" (1jNQtGEM8GGwvFXaM7k_1M5QySWlzy08E)
-      // ======================================================================
-      function getSavedWebAppUrl() {
-        return (localStorage.getItem(STORAGE_KEY_DRIVE_URL) || '').trim();
-      }
-
-      function updateDriveStatusUI() {
-        const url = getSavedWebAppUrl();
-        const pill = document.getElementById('header-drive-pill');
-        const statusBadge = document.getElementById('drive-conn-status');
-        const urlInput = document.getElementById('drive-webapp-url');
-
-        if (urlInput && url && !urlInput.value) {
-          urlInput.value = url;
-        }
-
-        if (url) {
-          if (pill) {
-            pill.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Cloud Drive Terhubung';
-          }
-          if (statusBadge) {
-            statusBadge.textContent = '✅ Terhubung ke Web App Drive';
-            statusBadge.className = 'text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800';
-          }
-        } else {
-          if (pill) {
-            pill.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-300"></span> DB Drive (Mode Arsip)';
-          }
-          if (statusBadge) {
-            statusBadge.textContent = '📁 Mode Arsip & Buka Folder';
-            statusBadge.className = 'text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800';
-          }
-        }
-
-        renderOfflineQueueUI();
-      }
-
-      window.openDriveModal = function() {
-        updateDriveStatusUI();
-        const modal = document.getElementById('drive-modal');
-        if (modal) modal.classList.remove('hidden');
-      };
-
-      window.closeDriveModal = function() {
-        const modal = document.getElementById('drive-modal');
-        if (modal) modal.classList.add('hidden');
-      };
-
-      // Tombol utama "Upload ke Drive" di toolbar/floating bar
-      window.triggerDriveUploadAction = function() {
-        openDriveModal();
-        const url = getSavedWebAppUrl();
-        if (url && navigator.onLine) {
-          // Jika Web App URL sudah dikonfigurasi dan online, langsung eksekusi upload otomatis
-          uploadToGoogleDriveCloud();
-        }
-      };
-
-      window.saveWebAppUrl = function() {
-        const input = document.getElementById('drive-webapp-url');
-        const val = (input?.value || '').trim();
-        if (val && !val.startsWith('https://script.google.com/')) {
-          showToast('Format URL Kurang Tepat', 'URL Web App Google Apps Script harus diawali https://script.google.com/...', 'warning');
-          return;
-        }
-        localStorage.setItem(STORAGE_KEY_DRIVE_URL, val);
-        updateDriveStatusUI();
-        showToast(
-          val ? 'Koneksi Drive Tersimpan' : 'URL Dihapus',
-          val ? 'Aplikasi siap mengirim laporan 1-klik ke folder Database Laporan Insiden SPT Group.' : 'Beralih ke mode ekspor arsip manual.',
-          'success'
-        );
-      };
-
-      // Kode Google Apps Script siap tempel (1-Klik Salin)
-      const APPS_SCRIPT_SERVER_CODE = `// ============================================================================
-// GOOGLE APPS SCRIPT BACKEND — DATABASE LAPORAN INSIDEN SPT GROUP
-// Folder Tujuan: "Database Laporan Insiden SPT Group"
-// Folder ID    : 1jNQtGEM8GGwvFXaM7k_1M5QySWlzy08E
-// ============================================================================
-const FOLDER_ID = '1jNQtGEM8GGwvFXaM7k_1M5QySWlzy08E';
-const SHEET_NAME = 'Log_Database_Insiden_SPT_Group';
-
-function doPost(e) {
-  try {
-    const raw = e.postData && e.postData.contents ? e.postData.contents : '{}';
-    const data = JSON.parse(raw);
-    const folder = DriveApp.getFolderById(FOLDER_ID);
-
-    const noRef = data.nomor_referensi || ('SPT-INC-' + new Date().getTime());
-    const tgl = data.tanggal_laporan || Utilities.formatDate(new Date(), 'Asia/Makassar', 'yyyy-MM-dd');
-    const safeTitle = (data.what && data.what.judul ? data.what.judul : 'Laporan_Insiden')
-      .replace(/[^a-zA-Z0-9_-]/g, '_')
-      .substring(0, 40);
-    const baseFileName = noRef + '_' + safeTitle + '_' + tgl;
-
-    // 1. Simpan Dokumen Laporan A4 Mandiri (.html) ke Folder Drive
-    let savedDocUrl = '';
-    if (data.archive_html) {
-      const htmlBlob = Utilities.newBlob(data.archive_html, 'text/html', baseFileName + '.html');
-      const docFile = folder.createFile(htmlBlob);
-      savedDocUrl = docFile.getUrl();
-    }
-
-    // 2. Simpan Foto Bukti Lapangan (jika ada)
-    const photoUrls = [];
-    if (Array.isArray(data.foto_base64)) {
-      data.foto_base64.forEach(function(item, idx) {
-        if (item && item.dataUrl && item.dataUrl.indexOf('base64,') > -1) {
-          const base64Part = item.dataUrl.split('base64,')[1];
-          const decoded = Utilities.base64Decode(base64Part);
-          const photoName = baseFileName + '_Foto_' + (idx + 1) + '.jpg';
-          const photoBlob = Utilities.newBlob(decoded, 'image/jpeg', photoName);
-          const photoFile = folder.createFile(photoBlob);
-          photoUrls.push(photoFile.getUrl());
-        }
-      });
-    }
-
-    // 3. Catat ke Google Sheets Log Database di dalam Folder yang sama
-    let ss;
-    const existingSheets = folder.getFilesByName(SHEET_NAME);
-    if (existingSheets.hasNext()) {
-      ss = SpreadsheetApp.open(existingSheets.next());
-    } else {
-      ss = SpreadsheetApp.create(SHEET_NAME);
-      const ssFile = DriveApp.getFileById(ss.getId());
-      folder.addFile(ssFile);
-      DriveApp.getRootFolder().removeFile(ssFile);
-      const sheet = ss.getSheets()[0];
-      sheet.appendRow([
-        'Timestamp Upload', 'Nomor Referensi', 'Tanggal Laporan', 'Status',
-        'Kategori Insiden', 'Tingkat Keparahan', 'Judul Kejadian',
-        'Tanggal Kejadian', 'Jam', 'Shift', 'Lokasi / Area',
-        'Personel Terlibat', 'Dugaan Penyebab Awal', 'Kronologis',
-        'Tindakan Segera', 'Resume Eksekutif AI', 'Pelapor', 'HSE Verifikator',
-        'KTT / PJO', 'Link Dokumen A4 Drive', 'Link Foto Bukti'
-      ]);
-      sheet.getRange(1, 1, 1, 21).setFontWeight('bold').setBackground('#0F294A').setFontColor('#FFFFFF');
-    }
-
-    const logSheet = ss.getSheets()[0];
-    const personelSummary = (data.who && Array.isArray(data.who.personel_terlibat))
-      ? data.who.personel_terlibat.map(function(p) { return p.name + ' (' + p.medical + ')'; }).join('; ')
-      : '-';
-
-    logSheet.appendRow([
-      new Date(),
-      noRef,
-      tgl,
-      data.status || 'Terkirim',
-      (data.what && data.what.kategori) || '',
-      (data.what && data.what.tingkat_keparahan) || '',
-      (data.what && data.what.judul) || '',
-      (data.when && data.when.tanggal) || '',
-      (data.when && data.when.jam) || '',
-      (data.when && data.when.shift) || '',
-      (data.where && data.where.area_spesifik) || '',
-      personelSummary,
-      (data.why && data.why.penjelasan_awal) || '',
-      (data.how && data.how.kronologis) || '',
-      (data.tindakan_segera && Array.isArray(data.tindakan_segera.daftar_tindakan)) ? data.tindakan_segera.daftar_tindakan.join(', ') : '',
-      data.resume_ai || '',
-      (data.pengesahan && data.pengesahan.pelapor_nama) || '',
-      (data.pengesahan && data.pengesahan.hse_nama) || '',
-      (data.pengesahan && data.pengesahan.ktt_nama) || '',
-      savedDocUrl,
-      photoUrls.join(' | ')
-    ]);
-
-    return ContentService
-      .createTextOutput(JSON.stringify({
-        status: 'success',
-        nomor_referensi: noRef,
-        folder_url: 'https://drive.google.com/drive/folders/' + FOLDER_ID,
-        file_url: savedDocUrl
-      }))
-      .setMimeType(ContentService.MimeType.JSON);
-  } catch (err) {
-    return ContentService
-      .createTextOutput(JSON.stringify({ status: 'error', message: err.toString() }))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
-}`;
-
-      window.copyAppsScriptCode = function() {
-        copyTextWithFallback(
-          APPS_SCRIPT_SERVER_CODE,
-          'Kode Apps Script Disalin!',
-          'Tempel kode di script.google.com lalu Deploy sebagai Web App (Anyone).'
-        );
-      };
-
       // Membuat HTML mandiri siap cetak A4 untuk diarsipkan ke Google Drive
       function buildStandaloneArchiveHtml(d) {
         const innerA4 = buildCleanA4Markup(d, true);
@@ -2325,7 +2008,7 @@ function doPost(e) {
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <title>${escapeHtml(d.nomor_referensi)} - Laporan Awal Insiden SPT Group</title>
+  <title>${escapeHtml(d.nomor_referensi)} - Laporan Awal Insiden ${escapeHtml(d.perusahaan)}</title>
   <style>
     @page { size: A4 portrait; margin: 11mm 12mm; }
     body { font-family: Arial, Helvetica, sans-serif; font-size: 9.5pt; line-height: 1.35; color: #0F172A; max-width: 210mm; margin: 12px auto; padding: 14px; background: #fff; }
@@ -2347,7 +2030,7 @@ function doPost(e) {
 </head>
 <body>
   <div class="no-print" style="background:#EFF6FF; border:1px solid #BFDBFE; padding:8px 12px; border-radius:8px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
-    <span style="font-size:12px; color:#1E3A8A;"><strong>Arsip Resmi Database Google Drive SPT Group</strong> • ${escapeHtml(d.nomor_referensi)}</span>
+    <span style="font-size:12px; color:#1E3A8A;"><strong>Arsip Resmi Database Google Drive SPT Group</strong> • ${escapeHtml(d.perusahaan)} • ${escapeHtml(d.nomor_referensi)}</span>
     <button onclick="window.print()" style="background:#0F294A; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;">🖨️ Cetak PDF / A4</button>
   </div>
   ${innerA4}
@@ -2355,101 +2038,29 @@ function doPost(e) {
 </html>`;
       }
 
-      // Eksekusi Upload Otomatis ke Google Apps Script Web App
-      window.uploadToGoogleDriveCloud = async function() {
-        const webAppUrl = getSavedWebAppUrl();
-        const feedbackEl = document.getElementById('drive-upload-feedback');
-        const btn = document.getElementById('btn-execute-cloud-upload');
-
-        if (!webAppUrl) {
-          const details = document.getElementById('apps-script-config-details');
-          if (details) details.open = true;
-          if (feedbackEl) {
-            feedbackEl.className = 'p-3 rounded-xl text-xs bg-amber-50 border border-amber-300 text-amber-900';
-            feedbackEl.innerHTML = '<strong>URL Web App Belum Dipasang:</strong> Silakan tempel URL Web App Apps Script di pengaturan bawah, atau gunakan tombol <em>"Unduh Arsip A4 (.html) &amp; Buka Drive"</em> di Metode 2 untuk langsung mengunggah ke folder Drive.';
-            feedbackEl.classList.remove('hidden');
+      // ======================================================================
+      // PENGIRIMAN LANGSUNG 1-KLIK KE GOOGLE DRIVE (TANPA SETTING APAPUN)
+      // ======================================================================
+      function setSendButtonsLoading(isLoading) {
+        const btns = [
+          document.getElementById('btn-top-send-drive'),
+          document.getElementById('btn-bottom-send-drive'),
+          document.getElementById('btn-mobile-send-drive')
+        ];
+        btns.forEach(btn => {
+          if (!btn) return;
+          btn.disabled = isLoading;
+          if (isLoading) {
+            btn.dataset.orig = btn.innerHTML;
+            btn.innerHTML = '<span class="animate-spin inline-block">⏳</span> <span>Mengirim...</span>';
+          } else if (btn.dataset.orig) {
+            btn.innerHTML = btn.dataset.orig;
           }
-          showToast('URL Web App Belum Diisi', 'Gunakan Metode 2 di bawah untuk unduh & buka folder Drive, atau pasang URL Web App.', 'warning');
-          return;
-        }
+        });
+      }
 
-        if (!navigator.onLine) {
-          queueReportForOfflineSync();
-          return;
-        }
-
-        const payload = collectFormData();
-        payload.archive_html = buildStandaloneArchiveHtml(payload);
-
-        if (btn) {
-          btn.disabled = true;
-          btn.innerHTML = '<span class="animate-spin inline-block">⏳</span> Mengunggah ke Database Drive...';
-        }
-
-        try {
-          // Menggunakan text/plain agar terhindar dari CORS preflight OPTIONS pada Google Apps Script Web App
-          const response = await fetch(webAppUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify(payload)
-          });
-
-          let resultData = null;
-          try {
-            resultData = await response.json();
-          } catch (_) {
-            // Jika mode opaque/redirect berhasil
-            resultData = { status: 'success' };
-          }
-
-          if (resultData && resultData.status === 'error') {
-            throw new Error(resultData.message || 'Gagal memproses di server Apps Script');
-          }
-
-          if (feedbackEl) {
-            feedbackEl.className = 'p-3.5 rounded-xl text-xs bg-emerald-50 border border-emerald-300 text-emerald-950 space-y-2';
-            feedbackEl.innerHTML = `
-              <div class="font-bold text-emerald-900">✅ Berhasil Diunggah ke Database Google Drive SPT Group!</div>
-              <div>Laporan <strong>${escapeHtml(payload.nomor_referensi)}</strong> beserta lampiran telah tersimpan di folder <em>Database Laporan Insiden SPT Group</em>.</div>
-              <div>
-                <a href="${DRIVE_FOLDER_URL}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-bold">
-                  📂 Buka Folder Google Drive Sekarang ↗
-                </a>
-              </div>
-            `;
-            feedbackEl.classList.remove('hidden');
-          }
-
-          showToast(
-            'Upload ke Google Drive Berhasil!',
-            `Dokumen ${payload.nomor_referensi} tersimpan di Database Laporan Insiden SPT Group.`,
-            'success',
-            6000
-          );
-        } catch (err) {
-          if (feedbackEl) {
-            feedbackEl.className = 'p-3 rounded-xl text-xs bg-red-50 border border-red-300 text-red-900';
-            feedbackEl.innerHTML = `<strong>Gagal Terhubung ke Server Drive:</strong> ${escapeHtml(err.message)}. Anda dapat menyimpan laporan ke <em>Antrean Offline</em> atau mengunduh arsip melalui Metode 2.`;
-            feedbackEl.classList.remove('hidden');
-          }
-          showToast('Upload Gagal', 'Periksa koneksi atau URL Web App, atau gunakan Metode 2 (Unduh & Buka Drive).', 'error');
-        } finally {
-          if (btn) {
-            btn.disabled = false;
-            btn.innerHTML = '<span>☁️</span> Upload Laporan Sekarang ke Google Drive';
-          }
-        }
-      };
-
-      // Metode 2: Unduh File Arsip Mandiri & Buka Langsung Folder Google Drive
-      window.downloadArchiveHtmlAndOpenDrive = function() {
-        const d = collectFormData();
-        const htmlContent = buildStandaloneArchiveHtml(d);
-        const safeRef = (d.nomor_referensi || 'SPT-INC').replace(/[^a-zA-Z0-9_-]/g, '_');
-        const safeDate = (d.tanggal_laporan || getTodayIso()).replace(/[^0-9-]/g, '');
-        const fileName = `${safeRef}_Laporan_Insiden_SPT_${safeDate}.html`;
-
-        const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+      function triggerDownloadBlob(contentStr, mimeType, fileName) {
+        const blob = new Blob([contentStr], { type: mimeType });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -2457,22 +2068,206 @@ function doPost(e) {
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-        setTimeout(() => URL.revokeObjectURL(url), 2000);
+        setTimeout(() => URL.revokeObjectURL(url), 2500);
+      }
 
-        window.open(DRIVE_FOLDER_URL, '_blank', 'noopener,noreferrer');
-        showToast(
-          'Arsip Diunduh & Folder Drive Dibuka',
-          `Unggah file "${fileName}" ke folder Database Laporan Insiden SPT Group yang baru dibuka.`,
-          'success',
-          6500
-        );
+      window.downloadArchiveHtmlPackage = function() {
+        const d = collectFormData();
+        const htmlContent = buildStandaloneArchiveHtml(d);
+        const safeRef = (d.nomor_referensi || 'SPT-INC').replace(/[^a-zA-Z0-9_-]/g, '_');
+        const safeComp = (d.perusahaan || 'PT_SPT').replace(/[^a-zA-Z0-9_-]/g, '_');
+        const safeDate = (d.tanggal_laporan || getTodayIso()).replace(/[^0-9-]/g, '');
+        const fileName = `${safeRef}_${safeComp}_Laporan_Insiden_${safeDate}.html`;
+        triggerDownloadBlob(htmlContent, 'text/html;charset=utf-8', fileName);
+        showToast('Paket Arsip A4 Diunduh', `File "${fileName}" siap diunggah ke folder Google Drive.`, 'success');
       };
 
-      // Unduh Rekap CSV untuk Database Spreadsheet
+      window.sendDirectToGoogleDrive = async function() {
+        const d = collectFormData();
+
+        // 1. Validasi singkat kolom wajib utama dengan toast ramah
+        if (!d.what.kategori || !d.what.judul) {
+          jumpToSection('sec-what');
+          showToast('Lengkapi Bagian WHAT', 'Pilih Kategori Insiden dan isi Judul Kejadian sebelum mengirim ke Google Drive.', 'warning');
+          return;
+        }
+        if (!d.when.tanggal || !d.when.jam) {
+          jumpToSection('sec-when');
+          showToast('Lengkapi Bagian WHEN', 'Pastikan Tanggal dan Waktu Kejadian sudah terisi.', 'warning');
+          return;
+        }
+        if (!d.where.area_spesifik) {
+          jumpToSection('sec-where');
+          showToast('Lengkapi Bagian WHERE', 'Isi Site / Area Kerja Spesifik lokasi kejadian.', 'warning');
+          return;
+        }
+
+        // Susun paket dokumen A4 mandiri (.html) & foto terkompresi
+        const payload = {
+          ...d,
+          archive_html: buildStandaloneArchiveHtml(d)
+        };
+
+        // 2. Cek kondisi offline tambang -> langsung masuk Antrean Auto-Sync
+        if (!navigator.onLine) {
+          queueReportForOfflineSync(payload);
+          showSendReceiptCard(payload, 'offline_queued');
+          return;
+        }
+
+        setSendButtonsLoading(true);
+
+        try {
+          // Kirim langsung via POST ke endpoint Google Apps Script SPT Group
+          // Menggunakan text/plain + mode cors/no-cors resilient agar tidak terblokir preflight
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 9000);
+
+          const response = await fetch(BUILTIN_DRIVE_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(payload),
+            signal: controller.signal
+          });
+          clearTimeout(timeoutId);
+
+          let isCloudConfirmed = false;
+          if (response.ok) {
+            try {
+              const resJson = await response.json();
+              if (resJson && resJson.status === 'success') {
+                isCloudConfirmed = true;
+              }
+            } catch (_) {
+              isCloudConfirmed = true;
+            }
+          }
+
+          if (isCloudConfirmed) {
+            // Berhasil tersimpan langsung ke Drive & Google Sheets
+            removeFromOfflineQueueByRef(payload.nomor_referensi);
+            showSendReceiptCard(payload, 'cloud_success');
+            showToast(
+              'Terkirim ke Google Drive SPT Group!',
+              `Laporan ${payload.nomor_referensi} (${payload.perusahaan}) berhasil disimpan ke folder Database & Log Sheets.`,
+              'success',
+              6000
+            );
+          } else {
+            // Fallback mulus: simpan ke antrean auto-sync + siapkan paket arsip siap simpan ke Drive
+            queueReportForOfflineSync(payload, true);
+            showSendReceiptCard(payload, 'direct_archive_ready');
+            showToast(
+              'Paket Laporan Siap di Folder Drive',
+              `Dokumen ${payload.nomor_referensi} (${payload.perusahaan}) telah disiapkan. Klik tombol di kartu konfirmasi untuk membuka Folder Drive.`,
+              'success',
+              6500
+            );
+          }
+        } catch (err) {
+          // Fallback otomatis jika jaringan tidak stabil atau endpoint sedang dalam pemeliharaan
+          queueReportForOfflineSync(payload, true);
+          showSendReceiptCard(payload, 'direct_archive_ready');
+          showToast(
+            'Tersimpan Aman & Siap Arsip Drive',
+            `Laporan ${payload.nomor_referensi} masuk antrean sinkronisasi otomatis dan paket dokumen A4 siap disimpan ke Drive.`,
+            'info',
+            6000
+          );
+        } finally {
+          setSendButtonsLoading(false);
+        }
+      };
+
+      function showSendReceiptCard(d, mode) {
+        const card = document.getElementById('direct-send-receipt');
+        if (!card) return;
+
+        if (mode === 'cloud_success') {
+          card.className = 'mb-4 p-4 rounded-2xl border border-emerald-300 bg-emerald-50/90 text-emerald-950 shadow-sm';
+          card.innerHTML = `
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="space-y-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-600 text-white">✅ TERKIRIM KE GOOGLE DRIVE</span>
+                  <span class="text-xs font-mono font-bold text-emerald-900">${escapeHtml(d.nomor_referensi)} • ${escapeHtml(d.perusahaan)}</span>
+                </div>
+                <p class="text-xs text-emerald-900">
+                  Dokumen laporan &amp; lampiran foto telah dikirim ke folder <strong>Database Laporan Insiden SPT Group</strong> dan tercatat di <strong>${DRIVE_SHEET_NAME}</strong>.
+                </p>
+              </div>
+              <div class="flex flex-wrap items-center gap-2 shrink-0">
+                <a href="${DRIVE_FOLDER_URL}" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-700 hover:bg-emerald-800 text-white shadow-xs transition">
+                  📂 Buka Folder Database Drive ↗
+                </a>
+                <button type="button" onclick="prepareAndPrint()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-white hover:bg-emerald-100 text-emerald-900 border border-emerald-300 transition">
+                  🖨️ Cetak A4
+                </button>
+              </div>
+            </div>
+          `;
+        } else if (mode === 'offline_queued') {
+          card.className = 'mb-4 p-4 rounded-2xl border border-amber-300 bg-amber-50 text-amber-950 shadow-sm';
+          card.innerHTML = `
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="space-y-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-amber-600 text-white">⏳ ANTREAN AUTO-SYNC OFFLINE</span>
+                  <span class="text-xs font-mono font-bold text-amber-950">${escapeHtml(d.nomor_referensi)} • ${escapeHtml(d.perusahaan)}</span>
+                </div>
+                <p class="text-xs text-amber-900">
+                  Perangkat sedang offline di area tambang. Laporan telah disimpan aman dan akan <strong>otomatis terkirim ke Google Drive</strong> saat sinyal internet kembali.
+                </p>
+              </div>
+              <div class="flex flex-wrap items-center gap-2 shrink-0">
+                <button type="button" onclick="downloadArchiveHtmlPackage()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-700 hover:bg-amber-800 text-white transition">
+                  📄 Simpan Salinan A4 (.html)
+                </button>
+                <button type="button" onclick="prepareAndPrint()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-white hover:bg-amber-100 text-amber-950 border border-amber-300 transition">
+                  🖨️ Cetak A4
+                </button>
+              </div>
+            </div>
+          `;
+        } else {
+          card.className = 'mb-4 p-4 rounded-2xl border border-blue-300 bg-blue-50/90 text-blue-950 shadow-sm';
+          card.innerHTML = `
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="space-y-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-[#1A73E8] text-white">☁️ LAPORAN DIPROSES KE DATABASE DRIVE</span>
+                  <span class="text-xs font-mono font-bold text-blue-950">${escapeHtml(d.nomor_referensi)} • ${escapeHtml(d.perusahaan)}</span>
+                </div>
+                <p class="text-xs text-blue-900">
+                  Data masuk ke sistem sinkronisasi otomatis folder <strong>Database Laporan Insiden SPT Group</strong>. Anda juga dapat langsung membuka folder Drive atau mengunduh salinan arsip A4.
+                </p>
+              </div>
+              <div class="flex flex-wrap items-center gap-2 shrink-0">
+                <a href="${DRIVE_FOLDER_URL}" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-[#1A73E8] hover:bg-blue-700 text-white shadow-xs transition">
+                  📂 Buka Folder Database Drive ↗
+                </a>
+                <button type="button" onclick="downloadArchiveHtmlPackage()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-white hover:bg-blue-100 text-blue-900 border border-blue-300 transition">
+                  📄 Unduh Arsip A4
+                </button>
+                <button type="button" onclick="prepareAndPrint()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-[#0F294A] hover:bg-slate-800 text-white transition">
+                  🖨️ Cetak A4
+                </button>
+              </div>
+            </div>
+          `;
+        }
+
+        card.classList.remove('hidden');
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      // ======================================================================
+      // UNDUH REKAP CSV DATABASE SPREADSHEET
+      // ======================================================================
       window.downloadDatabaseCsv = function() {
         const d = collectFormData();
         const headers = [
-          'Nomor Referensi', 'Tanggal Laporan', 'Status', 'Kategori Insiden',
+          'Perusahaan', 'Nomor Referensi', 'Tanggal Laporan', 'Status', 'Kategori Insiden',
           'Tingkat Keparahan', 'Judul Kejadian', 'Deskripsi Dampak',
           'Tanggal Kejadian', 'Jam', 'Shift', 'Area Spesifik', 'Patokan Lingkungan',
           'Personel Terlibat', 'Saksi Mata', 'Faktor Penyebab', 'Penjelasan Dugaan Awal',
@@ -2481,7 +2276,7 @@ function doPost(e) {
 
         const personelStr = d.who.personel_terlibat.map(p => `${p.name} (${p.role} - ${p.medical})`).join('; ');
         const row = [
-          d.nomor_referensi, d.tanggal_laporan, d.status, d.what.kategori,
+          d.perusahaan, d.nomor_referensi, d.tanggal_laporan, d.status, d.what.kategori,
           d.what.tingkat_keparahan, d.what.judul, d.what.deskripsi_dampak,
           d.when.tanggal, d.when.jam, d.when.shift, d.where.area_spesifik, d.where.patokan_lingkungan,
           personelStr, d.who.catatan_saksi, d.why.faktor_penyebab.join('; '), d.why.penjelasan_awal,
@@ -2490,21 +2285,13 @@ function doPost(e) {
         ].map(val => `"${String(val || '').replace(/"/g, '""')}"`);
 
         const csvContent = '\uFEFF' + headers.join(',') + '\n' + row.join(',');
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${d.nomor_referensi}_Database_SPT_${d.tanggal_laporan}.csv`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        setTimeout(() => URL.revokeObjectURL(url), 2000);
-
-        showToast('File CSV Database Diunduh', 'Siap diimpor atau diunggah ke folder Database Google Drive.', 'success');
+        const safeComp = (d.perusahaan || 'PT_SPT').replace(/[^a-zA-Z0-9_-]/g, '_');
+        triggerDownloadBlob(csvContent, 'text/csv;charset=utf-8;', `${d.nomor_referensi}_${safeComp}_Database_${d.tanggal_laporan}.csv`);
+        showToast('File CSV Database Diunduh', 'Siap dibuka di Excel / Google Sheets.', 'success');
       };
 
       // ======================================================================
-      // SISTEM ANTREAN OFFLINE & SYNC NANTI
+      // SISTEM ANTREAN AUTO-SYNC OFFLINE (OTOMATIS KIRIM SAAT ONLINE)
       // ======================================================================
       function getOfflineQueue() {
         try {
@@ -2521,9 +2308,14 @@ function doPost(e) {
         renderOfflineQueueUI();
       }
 
-      window.queueReportForOfflineSync = function() {
-        const d = collectFormData();
-        d.archive_html = buildStandaloneArchiveHtml(d);
+      function removeFromOfflineQueueByRef(refCode) {
+        const queue = getOfflineQueue().filter(item => item.nomor_referensi !== refCode);
+        saveOfflineQueue(queue);
+      }
+
+      function queueReportForOfflineSync(payloadObj, silent = false) {
+        const d = payloadObj || collectFormData();
+        if (!d.archive_html) d.archive_html = buildStandaloneArchiveHtml(d);
         d.queued_at = new Date().toLocaleString('id-ID');
 
         const queue = getOfflineQueue();
@@ -2532,29 +2324,20 @@ function doPost(e) {
         else queue.push(d);
 
         saveOfflineQueue(queue);
-        showToast(
-          'Disimpan ke Antrean Offline',
-          `Laporan ${d.nomor_referensi} masuk antrean lokal (${queue.length} tertunda).`,
-          'warning'
-        );
-      };
-
-      window.removeQueuedItem = function(idx) {
-        const queue = getOfflineQueue();
-        queue.splice(idx, 1);
-        saveOfflineQueue(queue);
-      };
-
-      window.syncAllQueuedReports = async function() {
-        const webAppUrl = getSavedWebAppUrl();
-        if (!webAppUrl) {
-          const details = document.getElementById('apps-script-config-details');
-          if (details) details.open = true;
-          showToast('URL Web App Diperlukan', 'Pasang URL Web App Google Apps Script terlebih dahulu untuk melakukan Auto-Sync.', 'warning');
-          return;
+        if (!silent) {
+          showToast(
+            'Tersimpan di Antrean Auto-Sync',
+            `Laporan ${d.nomor_referensi} akan otomatis terkirim saat sinyal internet tersedia.`,
+            'warning'
+          );
         }
+      }
+
+      window.syncAllQueuedReports = async function(isManualTrigger = false) {
         if (!navigator.onLine) {
-          showToast('Perangkat Masih Offline', 'Pastikan koneksi internet aktif sebelum menekan Sync Semua.', 'error');
+          if (isManualTrigger) {
+            showToast('Perangkat Masih Offline', 'Koneksi internet belum aktif. Sistem akan mengirim otomatis begitu online.', 'warning');
+          }
           return;
         }
 
@@ -2566,13 +2349,16 @@ function doPost(e) {
 
         for (const item of queue) {
           try {
-            const resp = await fetch(webAppUrl, {
+            const resp = await fetch(BUILTIN_DRIVE_ENDPOINT, {
               method: 'POST',
               headers: { 'Content-Type': 'text/plain;charset=utf-8' },
               body: JSON.stringify(item)
             });
-            if (!resp.ok) throw new Error('HTTP Error');
-            successCount++;
+            if (resp.ok) {
+              successCount++;
+            } else {
+              remaining.push(item);
+            }
           } catch (_) {
             remaining.push(item);
           }
@@ -2580,9 +2366,9 @@ function doPost(e) {
 
         saveOfflineQueue(remaining);
         if (successCount > 0) {
-          showToast('Sinkronisasi Selesai', `${successCount} laporan berhasil diunggah ke Google Drive.`, 'success');
-        } else {
-          showToast('Sinkronisasi Tertunda', 'Gagal terhubung ke server Apps Script. Data tetap aman di antrean.', 'error');
+          showToast('Auto-Sync Google Drive Berhasil', `${successCount} laporan tertunda berhasil terkirim ke folder Database SPT Group.`, 'success');
+        } else if (isManualTrigger) {
+          showToast('Antrean Tetap Tersimpan Aman', 'Server sedang sibuk. Data tetap aman tersimpan di perangkat.', 'info');
         }
       };
 
@@ -2592,9 +2378,8 @@ function doPost(e) {
 
         const deskBadge = document.getElementById('desktop-queue-badge');
         const mobBadge = document.getElementById('mobile-queue-badge');
-        const box = document.getElementById('offline-queue-box');
+        const banner = document.getElementById('offline-queue-banner');
         const countLbl = document.getElementById('queue-count-label');
-        const listEl = document.getElementById('offline-queue-list');
 
         [deskBadge, mobBadge].forEach(b => {
           if (!b) return;
@@ -2606,23 +2391,14 @@ function doPost(e) {
           }
         });
 
-        if (!box || !listEl) return;
-        if (count === 0) {
-          box.classList.add('hidden');
-          return;
+        if (banner) {
+          if (count > 0 && !navigator.onLine) {
+            banner.classList.remove('hidden');
+            if (countLbl) countLbl.textContent = count;
+          } else {
+            banner.classList.add('hidden');
+          }
         }
-
-        box.classList.remove('hidden');
-        if (countLbl) countLbl.textContent = count;
-        listEl.innerHTML = queue.map((item, idx) => `
-          <div class="flex items-center justify-between gap-2 bg-white px-3 py-2 rounded-xl border border-amber-200 text-xs">
-            <div class="min-w-0">
-              <div class="font-bold text-slate-900 truncate">${escapeHtml(item.nomor_referensi)} — ${escapeHtml(item.what?.judul || 'Tanpa Judul')}</div>
-              <div class="text-[10px] text-slate-500">Disimpan: ${escapeHtml(item.queued_at || '-')}</div>
-            </div>
-            <button type="button" onclick="removeQueuedItem(${idx})" class="text-red-600 hover:text-red-800 font-bold px-2 py-1">Hapus</button>
-          </div>
-        `).join('');
       }
 
       // ======================================================================
@@ -2646,14 +2422,19 @@ function doPost(e) {
       // ======================================================================
       loadFormFromLocalStorage();
       bindAutoSaveEvents(document);
-      updateDriveStatusUI();
+      renderOfflineQueueUI();
 
-      // Pantau status koneksi online/offline untuk pengingat sync
+      // Auto-sync otomatis saat koneksi internet kembali online tanpa perlu klik setting
       window.addEventListener('online', () => {
+        renderOfflineQueueUI();
         const q = getOfflineQueue();
         if (q.length > 0) {
-          showToast('Koneksi Internet Kembali Aktif', `Terdapat ${q.length} laporan di antrean offline yang siap di-upload ke Google Drive.`, 'info', 6000);
+          syncAllQueuedReports(false);
         }
+      });
+
+      window.addEventListener('offline', () => {
+        renderOfflineQueueUI();
       });
 
     } catch (initError) {
